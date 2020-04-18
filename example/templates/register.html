@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>register</title>
+</head>
+<body>
+    <form action="/register/" method="post">
+        {% csrf_token %}
+            <input type="text" name="username"/>
+            <input type="password" name="password"/>
+            <button type="submit">提交</button>
+    </form>
+    <a href="../">back to home</a>
+    <br/>
+    <a href="../login">go to login</a>
+        {% if message %}
+            <script type="text/javascript">
+                alert("{{ message }}");
+            </script>
+        {% endif %}
+</body>
+</html>
