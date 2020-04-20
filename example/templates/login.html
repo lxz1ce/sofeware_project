@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>login</title>
+</head>
+<body>
+    <form action="/login/" method="post">
+        {% csrf_token %}
+        请输入用户名<input type="text" name="username"/>
+        <br/>
+        请输入密码<input type="password" name="password"/>
+        <br/>
+        <button type="submit">提交</button>
+        <br/>
+    </form>
+    <a href="../">back to home</a>
+    <br/>
+    <a href="../register">go to register</a>
+    {% if message %}
+        <script type="text/javascript">
+            alert("{{ message }}");
+        </script>
+    {% endif %}
+</body>
+</html>
