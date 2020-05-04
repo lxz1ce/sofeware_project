@@ -5,15 +5,18 @@
     <title>Home</title>
 </head>
 <body>
-    <p>Hello {{ happy }} {{ world }}</p>
-    <a href="../login">login</a>
-    <br/>
-    <a href="../register">register</a>
-    <br/>
     {% if name %}
         <p>Hello {{ name }}</p>
         <br/>
-        <a href="../logout">logout</a>
+        <a href="../logout">退出登录</a>
+        <br/>
+        <a href="../main">进入程序</a>
+    {% else %}
+        <p>Hello {{ happy }} {{ world }}</p>
+        <a href="../login">登录</a>
+        <br/>
+        <a href="../register">注册</a>
+        <br/>
     {% endif %}
 </body>
 </html>
