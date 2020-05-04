@@ -26,7 +26,8 @@ def login(request):
 				return render(request, 'login.html', {"message": message})
 			if user.password == password:
 				request.session['id'] = user.id
-				return redirect('/')
+				message = '登陆成功，欢迎您，' + str(user.username)
+				return render(request, 'main.html', {"message": message})			#登录成功
 			else:
 				message = '密码错误'
 				return render(request, 'login.html', {"message":message})
@@ -80,3 +81,11 @@ def active(request, active_code):
 	else:
 		message = '邮箱验证失败，请重新注册'
 		return render(request, 'register.html', {"message": message})
+def main(request):
+	if request.session.get('id') == None:
+		return redirect('/')
+	return render(request, 'main.html')
+def show_info(request):
+	if request.session.get('id') == None:
+		return redirect('/')
+	return render(request, 'main.html')

@@ -23,5 +23,7 @@ urlpatterns = [
     path('login/', views.login),
     path('register/', views.register),
     path('logout/', views.logout),
+    path('show_info/', views.show_info),
+    path('main/', views.main),
     url(r'^active/(?P<active_code>.*)/$', views.active, name="user_active"),
 ]
