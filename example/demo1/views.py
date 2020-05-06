@@ -82,9 +82,11 @@ def active(request, active_code):
 		message = '邮箱验证失败，请重新注册'
 		return render(request, 'register.html', {"message": message})
 def main(request):
-	if request.session.get('id') == None:
-		return redirect('/')
-	return render(request, 'main.html')
+	login_name = ''
+	if request.session.get('id'):
+		user = models.User.objects.get(id=request.session.get('id'))
+		login_name = user.username
+	return render(request, 'main.html', {"name": login_name})
 def show_info(request):
 	if request.session.get('id') == None:
 		return redirect('/')

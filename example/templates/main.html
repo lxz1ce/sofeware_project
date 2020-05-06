@@ -5,15 +5,12 @@
     <title>主页</title>
 </head>
 <body>
-    <p>Hello {{ happy }} {{ world }}</p>
+    <p>Hello {{ name }}</p>
     <a href="../sale">租房</a>
     <br/>
     <a href="../show_info">个人中心</a>
     <br/>
-    {% if name %}
-        <p>Hello {{ name }}</p>
-        <br/>
-        <a href="../logout">logout</a>
-    {% endif %}
+    <br/>
+    <a href="../logout">logout</a>
 </body>
 </html>
