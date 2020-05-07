@@ -87,11 +87,15 @@ def active(request, active_code):
 def main(request):
 	if request.session.get('id') == None:
 		return redirect('/')
-	return render(request, 'main.html')
+	user = models.User.objects.get(id=request.session.get('id'))
+	login_name = user.username
+	return render(request, 'main.html', {"name": login_name})
 def show_info(request):
 	if request.session.get('id') == None:
 		return redirect('/')
 	return render(request, 'main.html')
+
+
 def add_house(request):
 	if request.method == 'POST':
 		house_name = request.POST.get('house_name')
@@ -124,3 +128,21 @@ def add_house(request):
 		message = "添加成功"
 		return render(request, 'add_house.html', locals())
 	return render(request, 'add_house.html')
+
+
+def search_house(request):
+	houses = models.House.objects.all()
+	if request.method == 'POST':
+		key_word = request.POST.get('key_word')
+		houses = models.House.objects.filter(housename__contains=key_word)
+		short_leasing = request.POST.get('short_leasing')
+		if short_leasing:
+			houses = houses.filter(short_leasing=True)
+		long_leasing = request.POST.get('long_leasing')
+		if long_leasing:
+			houses = houses.filter(long_leasing=True)
+		houses = houses.filter(short_leasing_fee__gte=request.POST.get('short_min_fee'))
+		houses = houses.filter(short_leasing_fee__lte=request.POST.get('short_max_fee'))
+		houses = houses.filter(long_leasing_fee__gte=request.POST.get('long_min_fee'))
+		houses = houses.filter(long_leasing_fee__lte=request.POST.get('long_max_fee'))
+	return render(request, 'search_house.html', {'houses': houses})
