@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="zn">
+<head>
+    <meta charset="UTF-8">
+    <title>搜索房源</title>
+</head>
+<body>
+    <form action="/search_house/" method="post">
+        {% csrf_token %}
+        搜索：<input type="text" name="key_word"/>
+        <input type="submit"/>
+        短租：<input type="radio" name="short_leasing"/>
+        长租：<input type="radio" name="long_leasing"/>
+        短租价格区间：<input type="number" name="short_min_fee" value=0 />-<input type="number" name="short_max_fee" value=99999 />
+        长租价格区间：<input type="number" name="long_min_fee" value=0 />-<input type="number" name="long_max_fee" value=99999 />
+    </form>
+    {% if houses %}
+        {% for house in houses %}
+            <tr>
+                <td>{{ house.housename }}</td>
+                <td>{{ house.short_leasing }}</td>
+                <td>{{ house.short_leasing_fee }}</td>
+                <td>{{ house.long_leasing }}</td>
+                <td>{{ house.long_leasing_fee }}</td>
+                <td>{{ house.house_type }}</td>
+                <td>{{ house.district }}</td>
+                <td>{{ house.address }}</td>
+                <td>{{ house.contact_number }}</td>
+            </tr>
+            <br/>
+        {% endfor %}
+    {% endif %}
+</body>
+</html>

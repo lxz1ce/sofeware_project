@@ -4,8 +4,16 @@
     <list default="true" id="f48b2afc-b16e-4413-96be-937c9dd4fc1b" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/db.sqlite3" beforeDir="false" afterPath="$PROJECT_DIR$/db.sqlite3" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo1/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/demo1/admin.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo1/migrations/0001_initial.py" beforeDir="false" afterPath="$PROJECT_DIR$/demo1/migrations/0001_initial.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo1/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/demo1/models.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/demo1/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/demo1/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/example/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/example/settings.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/example/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/example/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/Home.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/Home.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/login.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/login.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/templates/main.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/main.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/register.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/register.html" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -73,6 +81,7 @@
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/demo1/migrations/0001_initial.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
@@ -94,6 +103,7 @@
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/manage.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
@@ -150,6 +160,7 @@
       <workItem from="1585395250889" duration="3881000" />
       <workItem from="1585410890257" duration="232000" />
       <workItem from="1587224049864" duration="642000" />
+      <workItem from="1588580123150" duration="11226000" />
     </task>
     <servers />
   </component>
@@ -170,30 +181,34 @@
     </option>
   </component>
   <component name="WindowStateProjectService">
-    <state x="550" y="168" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1585020520566">
+    <state x="550" y="168" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1588588252235">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="550" y="168" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1585020520566" />
+    <state x="550" y="168" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1588588252235" />
+    <state x="690" y="266" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1588591422884">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="690" y="266" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1588591422884" />
     <state x="1148" y="129" key="#example" timestamp="1585020476189">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="1148" y="129" key="#example/0.0.1920.1040@0.0.1920.1040" timestamp="1585020476189" />
-    <state width="914" height="281" key="GridCell.Tab.0.bottom" timestamp="1587224708824">
+    <state width="1877" height="280" key="GridCell.Tab.0.bottom" timestamp="1588591767324">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="914" height="281" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1587224708824" />
-    <state width="914" height="281" key="GridCell.Tab.0.center" timestamp="1587224708824">
+    <state width="1877" height="280" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1588591767324" />
+    <state width="1877" height="280" key="GridCell.Tab.0.center" timestamp="1588591767323">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="914" height="281" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1587224708824" />
-    <state width="914" height="281" key="GridCell.Tab.0.left" timestamp="1587224708824">
+    <state width="1877" height="280" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1588591767323" />
+    <state width="1877" height="280" key="GridCell.Tab.0.left" timestamp="1588591767323">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="914" height="281" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1587224708824" />
-    <state width="914" height="281" key="GridCell.Tab.0.right" timestamp="1587224708824">
+    <state width="1877" height="280" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1588591767323" />
+    <state width="1877" height="280" key="GridCell.Tab.0.right" timestamp="1588591767324">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="914" height="281" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1587224708824" />
+    <state width="1877" height="280" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1588591767324" />
     <state width="914" height="347" key="GridCell.Tab.1.bottom" timestamp="1585054192666">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
@@ -218,9 +233,9 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="640" y="344" key="com.intellij.ide.util.TipDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1587224057422" />
-    <state x="1103" y="230" width="672" height="678" key="search.everywhere.popup" timestamp="1585397306117">
+    <state x="1103" y="230" width="672" height="678" key="search.everywhere.popup" timestamp="1588583127147">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="1103" y="230" width="672" height="678" key="search.everywhere.popup/0.0.1920.1040@0.0.1920.1040" timestamp="1585397306117" />
+    <state x="1103" y="230" width="672" height="678" key="search.everywhere.popup/0.0.1920.1040@0.0.1920.1040" timestamp="1588583127147" />
   </component>
 </project>

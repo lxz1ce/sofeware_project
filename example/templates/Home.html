@@ -5,18 +5,23 @@
     <title>Home</title>
 </head>
 <body>
-    {% if name %}
-        <p>Hello {{ name }}</p>
-        <br/>
-        <a href="../logout">退出登录</a>
+    {% if username %}
+        <p>Hello {{ username }}</p>
         <br/>
         <a href="../main">进入程序</a>
+        <br/>
+        <a href="../logout">退出登录</a>
     {% else %}
         <p>Hello {{ happy }} {{ world }}</p>
         <a href="../login">登录</a>
         <br/>
         <a href="../register">注册</a>
         <br/>
+    {% endif %}
+    {% if message %}
+        <script type="text/javascript">
+            alert("{{ message }}");
+        </script>
     {% endif %}
 </body>
 </html>

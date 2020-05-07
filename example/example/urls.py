@@ -17,6 +17,8 @@ from django.contrib import admin
 from django.urls import path
 from django.conf.urls import url
 from demo1 import views
+from django.conf import settings
+from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.home),
@@ -25,5 +27,7 @@ urlpatterns = [
     path('logout/', views.logout),
     path('show_info/', views.show_info),
     path('main/', views.main),
+    path('add_house/', views.add_house),
     url(r'^active/(?P<active_code>.*)/$', views.active, name="user_active"),
-]
+
+]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

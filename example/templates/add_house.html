@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>添加房源</title>
+</head>
+<body>
+    <form action="/add_house/" method="post">
+        {% csrf_token %}
+        请输入房源名<input type="text" name="house_name"/>
+        <br/>
+        是否可短租<br/>
+        <input type="radio" name="short_leasing" value="True" checked/>是
+        <br/>
+        <input type="radio" name="short_leasing" value="False" checked/>否
+        <br/>
+        请输入短租费用 /天<input type="number" name="short_leasing_fee" value=0 />
+        <br/>
+        是否可长租<br/>
+        <input type="radio" name="long_leasing" value=True checked/>是
+        <br/>
+        <input type="radio" name="long_leasing" value=False checked/>否
+        <br/>
+        请输入长租费用 /月<input type="number" name="long_leasing_fee" value=0 />
+        <br/>
+        请输入房间类型
+        <br/>
+        <input type="radio" name="house_type" value=0 />单人间
+        <br/>
+        <input type="radio" name="house_type" value=1 />双人间
+        <br/>
+        <input type="radio" name="house_type" value=2 />四人间
+        <br/>
+        请输入区域<input type="text" name="district"/>
+        <br/>
+        请输入地址<input type="text" name="address"/>
+        <br/>
+        请输入联系电话<input type="tel" name="contact_number">
+        <br/>
+        请上传照片<input type="file" name="photo">
+        <button type="submit">提交</button>
+    </form>
+    {% if message %}
+        <script type="text/javascript">
+            alert("{{ message }}");
+        </script>
+    {% endif %}
+</body>
+</html>

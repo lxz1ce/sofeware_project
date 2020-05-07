@@ -5,12 +5,19 @@
     <title>主页</title>
 </head>
 <body>
-    <p>Hello {{ name }}</p>
-    <a href="../sale">租房</a>
+    <p>Hello {{ username }}</p>
+    <a href="../sale">我要租房</a>
+    <br/>
+    <a href="../add_house">我要出租</a>
     <br/>
     <a href="../show_info">个人中心</a>
     <br/>
-    <br/>
     <a href="../logout">logout</a>
+    <br/>
+    {% if message %}
+        <script type="text/javascript">
+            alert("{{ message }}");
+        </script>
+    {% endif %}
 </body>
 </html>

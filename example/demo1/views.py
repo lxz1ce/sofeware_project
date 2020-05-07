@@ -1,12 +1,14 @@
+import os
+
 from django.shortcuts import render
 from django.shortcuts import redirect
 from demo1 import models, email as E
+from django.shortcuts import get_object_or_404
 def home(request):
 	login_name = ''
 	if request.session.get('id'):
 		user = models.User.objects.get(id = request.session.get('id'))
-		login_name = user.username
-	return render(request, 'home.html', {"name": login_name})
+	return render(request, 'home.html', {"username": user.username})
 def login(request):
 	if request.session.get('id') != None:
 		return redirect('/')
@@ -27,7 +29,7 @@ def login(request):
 			if user.password == password:
 				request.session['id'] = user.id
 				message = '登陆成功，欢迎您，' + str(user.username)
-				return render(request, 'main.html', {"message": message})			#登录成功
+				return render(request, 'main.html', {"message": message}, {"username": username})			#登录成功
 			else:
 				message = '密码错误'
 				return render(request, 'login.html', {"message":message})
@@ -39,36 +41,32 @@ def register(request):
 	if request.session.get('id') != None:  # 只有不在登录状态时才可以进行注册
 		return redirect('/')
 	if request.method == 'POST':
-		username = request.POST.get('username')
-		password1 = request.POST.get('password1')
-		password2 = request.POST.get('password2')
-		email = request.POST.get('email')
-		username = username.strip()  # 除去空格和换行
-		password1 = password1.strip()
-		password2 = password2.strip()
-		email = email.strip()
-		if models.User.objects.filter(username = username).exists():
-			message = '该用户名已被注册'
+		username = request.POST.get('username').strip()
+		password1 = request.POST.get('password1').strip()
+		password2 = request.POST.get('password2').strip()
+		email = request.POST.get('email').strip()
+		legal, message = checkout(username, password1, password2, email)
+		if not legal:
 			return render(request, 'register.html', {"message": message})
-		elif models.User.objects.filter(email = email).exists() and models.User.objects.get(email = email).status == 1:
-			message = '该邮箱已被注册'
-			return render(request, 'register.html', {"message": message})
-		elif password1 != password2:
-			message = '两次密码不一致'
-			return render(request, 'register.html', {"message": message})
-		user = models.User()
-		user.username = username
-		user.password = password1
-		user.email = email
-		user.status = 0
-		user.active_code = E.send_register_email(email)
-		print(user.active_code)
-		user.save()
-		return redirect('/')
+		add_user(username, password1, email)
+		message = '注册成功，请查看邮箱验证'
+		return render(request, 'home.html', {"message": message})
 	return render(request, 'register.html')
 def logout(request):
 	request.session.flush()
 	return redirect('/')
+def checkout(username, password1, password2, email):
+	legal = False
+	if models.User.objects.filter(username=username).exists():
+		message = '该用户名已被注册'
+	elif models.User.objects.filter(email=email).exists() and models.User.objects.get(email=email).status == 1:
+		message = '该邮箱已被注册'
+	elif password1 != password2:
+		message = '两次密码不一致'
+	else:
+		message = ''
+		legal = True
+	return legal, message
 def active(request, active_code):
 	all_users =	models.User.objects.filter(active_code = active_code)
 	print(active_code)
@@ -82,12 +80,74 @@ def active(request, active_code):
 		message = '邮箱验证失败，请重新注册'
 		return render(request, 'register.html', {"message": message})
 def main(request):
-	login_name = ''
 	if request.session.get('id'):
-		user = models.User.objects.get(id=request.session.get('id'))
-		login_name = user.username
-	return render(request, 'main.html', {"name": login_name})
-def show_info(request):
-	if request.session.get('id') == None:
-		return redirect('/')
+		user = models.User.objects.get(id = request.session.get('id'))
+		return render(request, 'main.html', {"username": user.username})
 	return render(request, 'main.html')
+def show_info(request):
+	if request.session.get('id'):
+		user = models.User.objects.get(id = request.session.get('id'))
+		username = user.username
+		password = user.password
+		email = user.email
+	if request.method == 'POST':
+		models.User.objects.filter(username=username).delete()
+		new_username = request.POST.get('username').strip()
+		new_password1 = request.POST.get('password1').strip()
+		new_password2 = request.POST.get('password2').strip()
+		legal, message = checkout(new_username, new_password1, new_password2, email)
+		if not legal:
+			add_user(username, password, email)
+			return render(request, 'show_info.html', locals())
+		user = add_user(new_username, new_password1, email, False)
+		request.session['id'] = user.id
+		username = user.username
+		password = user.password
+		message = '修改成功'
+		return render(request, 'main.html', locals())
+	else:
+
+		return render(request, 'show_info.html', locals())
+def add_user(username, password1, email, new_user = True):
+	user = models.User()
+	user.username = username
+	user.password = password1
+	user.email = email
+	user.status = 1
+	if new_user:
+		user.status = 0
+		user.active_code = E.send_register_email(email)
+	user.save()
+	return user
+def add_house(request):
+	if request.method == 'POST':
+		house_name = request.POST.get('house_name')
+		short_leasing = request.POST.get('short_leasing')
+		if short_leasing:
+			short_leasing_fee = request.POST.get('short_leasing_fee')
+		long_leasing = request.POST.get('long_leasing')
+		if long_leasing:
+			long_leasing_fee = request.POST.get('long_leasing_fee')
+		house_type = request.POST.get('house_type')
+		district = request.POST.get('district')
+		address = request.POST.get('address')
+		contact_number = request.POST.get('contact_number')
+		file = request.FILES.get("photo", None)
+
+		house = models.House()
+		house.housename = house_name
+		house.short_leasing = short_leasing
+		if short_leasing :
+			house.short_leasing_fee = short_leasing_fee
+		house.long_leasing = long_leasing
+		if long_leasing :
+			house.long_leasing_fee = long_leasing_fee
+		house.house_type = house_type
+		house.district = district
+		house.address = address
+		house.contact_number = contact_number
+		house.photo = file
+		house.save()
+		message = "添加成功"
+		return render(request, 'main.html', {"message": message})
+	return render(request, 'add_house.html')
