@@ -28,6 +28,7 @@ urlpatterns = [
     path('show_info/', views.show_info),
     path('main/', views.main),
     path('add_house/', views.add_house),
+    path('search_house/', views.search_house),
     url(r'^active/(?P<active_code>.*)/$', views.active, name="user_active"),
 
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -5,7 +5,6 @@ from django.shortcuts import redirect
 from demo1 import models, email as E
 from django.shortcuts import get_object_or_404
 def home(request):
-	login_name = ''
 	if request.session.get('id'):
 		user = models.User.objects.get(id = request.session.get('id'))
 	return render(request, 'home.html', {"username": user.username})
@@ -151,3 +150,19 @@ def add_house(request):
 		message = "添加成功"
 		return render(request, 'main.html', {"message": message})
 	return render(request, 'add_house.html')
+def search_house(request):
+	houses = models.House.objects.all()
+	if request.method == 'POST':
+		key_word = request.POST.get('key_word')
+		houses = models.House.objects.filter(housename__contains=key_word)
+		short_leasing = request.POST.get('short_leasing')
+		if short_leasing:
+			houses = houses.filter(short_leasing=True)
+		long_leasing = request.POST.get('long_leasing')
+		if long_leasing:
+			houses = houses.filter(long_leasing=True)
+		houses = houses.filter(short_leasing_fee__gte=request.POST.get('short_min_fee'))
+		houses = houses.filter(short_leasing_fee__lte=request.POST.get('short_max_fee'))
+		houses = houses.filter(long_leasing_fee__gte=request.POST.get('long_min_fee'))
+		houses = houses.filter(long_leasing_fee__lte=request.POST.get('long_max_fee'))
+	return render(request, 'search_house.html', {'houses': houses})
