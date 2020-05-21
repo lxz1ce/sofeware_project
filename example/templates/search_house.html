@@ -14,6 +14,8 @@
         短租价格区间：<input type="number" name="short_min_fee" value=0 />-<input type="number" name="short_max_fee" value=99999 />
         长租价格区间：<input type="number" name="long_min_fee" value=0 />-<input type="number" name="long_max_fee" value=99999 />
     </form>
+    <a href="../main">返回</a>
+    <br/>
     {% if houses %}
         {% for house in houses %}
             <tr>
@@ -30,5 +32,9 @@
             <br/>
         {% endfor %}
     {% endif %}
+    <script type="text/javascript">
+
+
+    </script>
 </body>
 </html>

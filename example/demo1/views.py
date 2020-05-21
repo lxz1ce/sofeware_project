@@ -5,9 +5,11 @@ from django.shortcuts import redirect
 from demo1 import models, email as E
 from django.shortcuts import get_object_or_404
 def home(request):
+	login_name = ""
 	if request.session.get('id'):
 		user = models.User.objects.get(id = request.session.get('id'))
-	return render(request, 'home.html', {"username": user.username})
+		login_name = user.username
+	return render(request, 'home.html', {"username": login_name})
 def login(request):
 	if request.session.get('id') != None:
 		return redirect('/')
@@ -28,7 +30,8 @@ def login(request):
 			if user.password == password:
 				request.session['id'] = user.id
 				message = '登陆成功，欢迎您，' + str(user.username)
-				return render(request, 'main.html', {"message": message}, {"username": username})			#登录成功
+				print("!")
+				return render(request, 'main.html', {"message": message, "username": username})			#登录成功
 			else:
 				message = '密码错误'
 				return render(request, 'login.html', {"message":message})
@@ -55,16 +58,24 @@ def logout(request):
 	request.session.flush()
 	return redirect('/')
 def checkout(username, password1, password2, email):
-	legal = False
+	legal = True
+	message = ''
 	if models.User.objects.filter(username=username).exists():
 		message = '该用户名已被注册'
-	elif models.User.objects.filter(email=email).exists() and models.User.objects.get(email=email).status == 1:
-		message = '该邮箱已被注册'
-	elif password1 != password2:
+		legal = False
+	elif models.User.objects.filter(email=email).exists():
+		exist = False
+		for i in models.User.objects.filter(email=email).all():
+			if i.status == 1:
+				exist = True
+		if exist:
+			message = '该邮箱已被注册'
+			legal = False
+		else:
+			legal = True
+	if password1 != password2 and legal:
 		message = '两次密码不一致'
-	else:
-		message = ''
-		legal = True
+		legal = False
 	return legal, message
 def active(request, active_code):
 	all_users =	models.User.objects.filter(active_code = active_code)
@@ -136,10 +147,10 @@ def add_house(request):
 		house = models.House()
 		house.housename = house_name
 		house.short_leasing = short_leasing
-		if short_leasing :
+		if short_leasing:
 			house.short_leasing_fee = short_leasing_fee
 		house.long_leasing = long_leasing
-		if long_leasing :
+		if long_leasing:
 			house.long_leasing_fee = long_leasing_fee
 		house.house_type = house_type
 		house.district = district
@@ -152,6 +163,10 @@ def add_house(request):
 	return render(request, 'add_house.html')
 def search_house(request):
 	houses = models.House.objects.all()
+	login_name = ""
+	if request.session.get('id'):
+		user = models.User.objects.get(id=request.session.get('id'))
+		login_name = user.username
 	if request.method == 'POST':
 		key_word = request.POST.get('key_word')
 		houses = models.House.objects.filter(housename__contains=key_word)
@@ -165,4 +180,4 @@ def search_house(request):
 		houses = houses.filter(short_leasing_fee__lte=request.POST.get('short_max_fee'))
 		houses = houses.filter(long_leasing_fee__gte=request.POST.get('long_min_fee'))
 		houses = houses.filter(long_leasing_fee__lte=request.POST.get('long_max_fee'))
-	return render(request, 'search_house.html', {'houses': houses})
+	return render(request, 'search_house.html', {'houses': houses, "username": login_name})

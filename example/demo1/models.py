@@ -47,3 +47,24 @@ class House(models.Model):
 		ordering = ['houseid']
 
 
+class Application(models.Model):
+	apply_id = models.AutoField(primary_key=True)
+	username = models.CharField(max_length=10)
+	house_id = models.IntegerField()
+	is_allow = models.BooleanField(default=False)
+	def __str__(self):
+		return str(self.apply_id)
+
+	class Meta:
+		ordering = ['apply_id']
+
+
+class Customerserver(models.Model):
+	username = models.CharField(max_length=10, unique=True)
+	password = models.CharField(max_length=15)
+
+	def __str__(self):
+		return self.username
+
+	class Meta:
+		ordering = ['id']
