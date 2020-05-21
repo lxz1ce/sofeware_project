@@ -19,10 +19,9 @@ class User(models.Model):
 	class Meta:
 		ordering = ['id']
 
-
 class House(models.Model):
-	houseid = models.AutoField(primary_key=True)
-	housename = models.CharField(max_length=50)
+	house_id = models.AutoField(primary_key=True)
+	house_name = models.CharField(max_length=50)
 	short_leasing = models.BooleanField(default=False)
 	short_leasing_fee = models.IntegerField(null=True, blank=True)
 	long_leasing = models.BooleanField(default=False)
@@ -32,19 +31,13 @@ class House(models.Model):
 	district = models.CharField(max_length=10, blank=True, null=True)
 	address = models.CharField(max_length=100, blank=True, null=True)
 	contact_number = models.CharField(max_length=15, default='未知', blank=True, null=True)
-	photo = models.ImageField('照片', upload_to='house_photo/', blank=True, null=True)
-
-	def photo_url(self):
-		if self.photo and hasattr(self.photo, 'url'):
-			return self.photo.url
-		else:
-			return '../static/images/1.png'
+	picture = models.ImageField('照片', upload_to='demo1/', blank=True, null=True)
 
 	def __str__(self):
-		return str(self.houseid)
+		return str(self.house_id)
 
 	class Meta:
-		ordering = ['houseid']
+		ordering = ['house_id']
 
 
 class Application(models.Model):

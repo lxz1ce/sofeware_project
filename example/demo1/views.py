@@ -2,6 +2,7 @@ import os
 
 from django.shortcuts import render
 from django.shortcuts import redirect
+from django.conf import settings
 from demo1 import models, email as E
 from django.shortcuts import get_object_or_404
 def home(request):
@@ -142,24 +143,35 @@ def add_house(request):
 		district = request.POST.get('district')
 		address = request.POST.get('address')
 		contact_number = request.POST.get('contact_number')
-		file = request.FILES.get("photo", None)
+		file = request.FILES.get("picture", None)
+		if not file or not str(file.name).__contains__("jpg"):
+			return render(request, 'add_house.html', {"message": "图片仅支持jpg文件"})
 
 		house = models.House()
-		house.housename = house_name
-		house.short_leasing = short_leasing
-		if short_leasing:
-			house.short_leasing_fee = short_leasing_fee
-		house.long_leasing = long_leasing
-		if long_leasing:
-			house.long_leasing_fee = long_leasing_fee
-		house.house_type = house_type
-		house.district = district
-		house.address = address
-		house.contact_number = contact_number
-		house.photo = file
-		house.save()
-		message = "添加成功"
-		return render(request, 'main.html', {"message": message})
+		if house_name and house_type and district and address and contact_number and file:
+			house.house_name = house_name
+			house.short_leasing = short_leasing
+			if short_leasing:
+				house.short_leasing_fee = short_leasing_fee
+			house.long_leasing = long_leasing
+			if long_leasing:
+				house.long_leasing_fee = long_leasing_fee
+			house.house_type = house_type
+			house.district = district
+			house.address = address
+			house.contact_number = contact_number
+			house.save()
+			house.picture = "/demo1/" + str(house.house_id) + ".jpg"
+			filename = settings.MEDIA_ROOT + "/demo1/" + str(house.house_id) + ".jpg"
+			with open(filename, 'wb') as pic:
+				for c in file.chunks():
+					pic.write(c)
+			house.save()
+			message = "添加成功"
+			return render(request, 'main.html', {"message": message})
+		else:
+			message = "请将信息填写完整"
+			return render(request, 'add_house.html', {"message": message})
 	return render(request, 'add_house.html')
 def search_house(request):
 	houses = models.House.objects.all()
