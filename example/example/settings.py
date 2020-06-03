@@ -23,9 +23,9 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'rapqigp7hu5uv%8b6#n52hj+9r2u0(*(ft18(wny$o_1lj9=(='
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -135,7 +135,8 @@ EMAIL_FROM = '<1583484408@qq.com>'
 
 
 # 配置 MEDIA_ROOT 作为你上传文件在服务器中的基本路径
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media') # 注意此处不要写成列表或元组的形式
+MEDIA_ROOT = os.path.join(BASE_DIR, 'static/media') # 注意此处不要写成列表或元组的形式
 # 配置 MEDIA_URL 作为公用 URL，指向上传文件的基本路径
 MEDIA_URL = '/media/'
 # 这里特意写成 upload 和 media，而不是统一写成 media 或 upload，是为了便于理解 MEDIA_ROOT 和 MEDIA_URL 的作用和区别
+

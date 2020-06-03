@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>投诉</title>
+</head>
+<body>
+     <form action="/reporting/" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        投诉标题：<input type="text" name="title"/>
+        <br/>
+        投诉内容：<input type="text" name="content"/>
+        <br/>
+        请上传图片描述(仅支持jpg文件)<input type="file" name="picture" multiple="">
+        <br/>
+        <button type="submit">提交</button>
+    </form>
+    <a href="../main">返回</a>
+    <br/>
+    {% if message %}
+        <script type="text/javascript">
+            alert("{{ message }}");
+        </script>
+    {% endif %}
+</body>
+</html>

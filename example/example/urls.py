@@ -20,6 +20,7 @@ from demo1 import views
 from django.conf import settings
 from django.conf.urls.static import static
 urlpatterns = [
+    path('specific_info/', views.specific_info),
     path('admin/', admin.site.urls),
     path('', views.home),
     path('login/', views.login),
@@ -29,6 +30,29 @@ urlpatterns = [
     path('main/', views.main),
     path('add_house/', views.add_house),
     path('search_house/', views.search_house),
+    path('add_technician/', views.add_technician),
+    path('check_app/', views.check_app),
+    path('my_app/', views.my_app),
+    path('user_info/', views.user_info),
+    path('repairing/', views.repairing),
+    path('manage_repairing/', views.manage_repairing),
+    path('cancel_repairing/', views.cancel_repairing),
+    path('arrange_repairing/', views.arrange_repairing),
+    path('pay/', views.pay),
+    path('confirm_payment/', views.confirm_payment),
+    path('cancel_apply/', views.cancel_apply),
+    path('send_message/', views.send_message),
+    path('my_message/', views.my_message),
+    path('delete_house/', views.delete_house),
+    path('create_apply/', views.create_apply),
+    path('reporting/', views.reporting),
+    path('manage_reporting/', views.manage_reporting),
+    path('handle_reporting/', views.handle_reporting),
+    path('my_reporting/', views.my_reporting),
+    path('export_app/', views.export_app),
+    path('download_app/', views.download_app),
+    path('remind/', views.remind),
+    url(r'^download/', views.download_app, name='crm_download'),
     url(r'^active/(?P<active_code>.*)/$', views.active, name="user_active"),
 
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>个人信息</title>
+</head>
+<body>
+    <form action="/show_info/" method="post">
+        {% csrf_token %}
+        用户名<input type="text" name="username" value="{{ username }}"/>
+        <br/>
+        密码<input type="text" name="password1" value="{{ password }}"/>
+        <br/>
+        再次输入密码(若修改)<input type="text" name="password2"/>
+        <br/>
+        邮箱(不可修改)<input value="{{ email }}" readonly/>
+        <br/>
+        <button type="submit">提交</button>
+        <br/>
+        <a href="../main">返回</a>
+    </form>
+    {% if message %}
+        <script type="text/javascript">
+            alert("{{ message }}");
+        </script>
+    {% endif %}
+</body>
+</html>

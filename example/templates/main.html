@@ -5,15 +5,41 @@
     <title>主页</title>
 </head>
 <body>
-    <p>Hello {{ happy }} {{ world }}</p>
-    <a href="../search_house">租房</a>
+    <p>Hello {{ username }} 你是{{ kind }}</p>
+    <a href="../search_house">我要租房</a>
     <br/>
     <a href="../show_info">个人中心</a>
     <br/>
-    {% if name %}
-        <p>Hello {{ name }}</p>
+    {% if kind == "CS" %}
+        <a href="../add_technician">添加工单师傅</a>
         <br/>
-        <a href="../logout">logout</a>
+        <a href="../add_house">添加房源</a>
+        <br/>
+        <a href="../check_app">审核租房申请</a>
+        <br/>
+        <a href="../send_message">发送消息</a>
+        <br/>
+        <a href="../create_apply">创建租房订单</a>
+        <br/>
+        <a href="../manage_repairing">管理保修</a>
+        <br/>
+        <a href="../manage_reporting">管理投诉</a>
+        <br/>
+    {% endif %}
+    {% if kind == "user" %}
+        <a href="../my_app">我的租房申请</a>
+        <br/>
+        <a href="../my_reporting">我的投诉</a>
+        <br/>
+        <a href="../my_message">我的消息{{ unread }}</a>
+        <br/>
+    {% endif %}
+    <a href="../logout">logout</a>
+    <br/>
+    {% if message %}
+        <script type="text/javascript">
+            alert("{{ message }}");
+        </script>
     {% endif %}
 </body>
 </html>

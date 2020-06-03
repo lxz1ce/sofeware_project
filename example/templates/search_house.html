@@ -8,16 +8,36 @@
     <form action="/search_house/" method="post">
         {% csrf_token %}
         搜索：<input type="text" name="key_word"/>
+        区域:<select name="district">
+        <option value="东城区">东城区</option>
+        <option value="西城区">西城区</option>
+        <option value="朝阳区">朝阳区</option>
+        <option value="丰台区">丰台区</option>
+        <option value="石景山区">石景山区</option>
+        <option value="海淀区">海淀区</option>
+        <option value="顺义区">顺义区</option>
+        <option value="通州区">通州区</option>
+        <option value="大兴区">大兴区</option>
+        <option value="房山区">房山区</option>
+        <option value="门头沟区">门头沟区</option>
+        <option value="昌平区">昌平区</option>
+        <option value="平谷区">平谷区</option>
+        <option value="密云区">密云区</option>
+        <option value="怀柔区">怀柔区</option>
+        <option value="延庆区">延庆区</option>
+        </select>
         <input type="submit"/>
         短租：<input type="radio" name="short_leasing"/>
         长租：<input type="radio" name="long_leasing"/>
         短租价格区间：<input type="number" name="short_min_fee" value=0 />-<input type="number" name="short_max_fee" value=99999 />
         长租价格区间：<input type="number" name="long_min_fee" value=0 />-<input type="number" name="long_max_fee" value=99999 />
     </form>
+    <a href="../main">返回</a>
+    <br/>
     {% if houses %}
         {% for house in houses %}
             <tr>
-                <td>{{ house.housename }}</td>
+                <td>{{ house.house_name }}</td>
                 <td>{{ house.short_leasing }}</td>
                 <td>{{ house.short_leasing_fee }}</td>
                 <td>{{ house.long_leasing }}</td>
@@ -26,9 +46,27 @@
                 <td>{{ house.district }}</td>
                 <td>{{ house.address }}</td>
                 <td>{{ house.contact_number }}</td>
+                <td>房屋状态：{{ house.status }}</td>
             </tr>
+            <form action="/specific_info/" method="post">
+                {% csrf_token %}
+                <input name="selected_id" type="hidden" value="{{house.house_id}}">
+                <input type="submit" value="查看该房源"/>
+            </form>
+            {% if kind == 'CS' %}
+                <form action="/delete_house/" method="post">
+                {% csrf_token %}
+                <input name="house_id" type="hidden" value="{{house.house_id}}">
+                <input type="submit" value="下架该房源"/>
+                </form>
+            {% endif %}
             <br/>
         {% endfor %}
+    {% endif %}
+    {% if message %}
+        <script type="text/javascript">
+            alert("{{ message }}");
+        </script>
     {% endif %}
 </body>
 </html>
