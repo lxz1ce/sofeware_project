@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="zh">
 <head>
@@ -7,20 +8,22 @@
     <title>登录</title>
     <style>
         .bk{
-            background-color:rgb(170, 170, 170)
+            background-color:white;
+            background-image:url("../static/images/background.jpg");
+            background-size: 100% 100%;
+            background-attachment: fixed;
         }
         .white{
             color:white;
         }
     </style>
+
 </head>
-<body class="bk logobg_style">
+<body class="bk logobg_style" >
+    
     <div id="large-header" style="margin-top:200px;">
         <canvas id="demo-canvas" width="2000" height="711" style="z-index: -1; position: absolute; margin-top: -200px;"></canvas>
-        <div class="container"  style="width:450px;height: 400px;background-color: rgba(130,130,130,1);border-radius: 30px; ">
-            <div class="navbar navbar-inverse navbar-fixed-top position:fixed">
-                <a href="#" class="navbar-brand text-align='center'">青年租房管理系统</a>
-            </div>
+        <div class="container"  style="width:450px;height: 400px;background-color: rgba(140,140,140,0.5);border-radius: 10px; ">
         <form action="/login/" method="post" role="form">
         {% csrf_token %}
         <h1 class="white" style="text-align: center;">用户登录</h1>
@@ -72,10 +75,10 @@
     </div>
     
     </div>
-    <script src="../js/TweenLite/TweenLite.min.js"></script>
-    <script src="../js/TweenLite/EasePack.min.js"></script>
-    <script src="../js/TweenLite/rAF.js"></script>
-    <script src="../js/TweenLite/demo-1.js"></script>
+    <script src="../static/js/TweenLite/TweenLite.min.js"></script>
+    <script src="../static/js/TweenLite/EasePack.min.js"></script>
+    <script src="../static/js/TweenLite/rAF.js"></script>
+    <script src="../static/js/TweenLite/demo-1.js"></script>
 </body>
 
 <script>

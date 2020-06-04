@@ -25,11 +25,11 @@
                 <td>apply_id:{{ app.apply_id }} </td>
                 <td>username:{{ app.username }} </td>
                 <td>house_id:{{ app.house_id }} </td>
-                <td>is_allow:{{ app.is_allowed }} </td>
+                <td>is_allowed:{{ app.is_allowed }} </td>
+                <td>is_paid:{{ app.is_paid }} </td>
                 {% if app.is_allowed %}
                     <td>allowed_by:{{ app.allowed_by }} </td>
                 {% endif %}
-                <td>is_paid:{{ app.is_paid }}</td>
                 <td>rent_type:{{ app.rent_type }} </td>
                 <td>起始日期：{{ app.s_y }}年{{ app.s_m }}月{{ app.s_d }}日</td>
                 <td>时长：{{ app.duration }}</td>

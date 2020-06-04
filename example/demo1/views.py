@@ -1,5 +1,6 @@
 import os
 from dateutil import rrule
+from datetime import datetime
 import datetime
 import time
 
@@ -14,6 +15,7 @@ from django.shortcuts import get_object_or_404
 from docx import Document
 from docx.enum.text import WD_PARAGRAPH_ALIGNMENT
 from docx.shared import Inches
+import datetime
 CS_key = '666666'
 
 
@@ -108,6 +110,8 @@ def register(request):
 		username = request.POST.get('username').strip()
 		password1 = request.POST.get('password1').strip()
 		password2 = request.POST.get('password2').strip()
+		real_name = request.POST.get('real_name')
+		ID_card = request.POST.get('ID_card')
 		email = request.POST.get('email').strip()
 		is_CS = request.POST.getlist('is_CS')
 		if is_CS:  # 处理客服注册
@@ -131,7 +135,7 @@ def register(request):
 		legal, message = checkout(username, password1, password2, email)
 		if not legal:
 			return render(request, 'register.html', {"message": message})
-		add_user(username, password1, email)
+		add_user(username, password1, email, real_name, ID_card)
 		message = '注册成功，请查看邮箱验证'
 		return render(request, 'home.html', {"message": message})
 	return render(request, 'register.html')
@@ -197,10 +201,13 @@ def main(request):
 
 
 def show_info(request):
+	kind = request.session.get('kind')
 	if request.session.get('id'):
 		if request.session.get('kind') == 'user':
 			user = models.User.objects.get(id = request.session.get('id'))
 			email = user.email
+			real_name = user.real_name
+			ID_card = user.ID_card
 		else:
 			user = models.Customerserver.objects.get(id = request.session.get('id'))
 			email = "客服无邮箱记录"
@@ -209,15 +216,18 @@ def show_info(request):
 	if request.method == 'POST':
 		if request.session.get('kind') == 'user':
 			email = models.User.objects.get(id = request.session.get('id')).email
+			real_name = models.User.objects.get(id=request.session.get('id')).real_name
+			ID_card = models.User.objects.get(id = request.session.get('id')).ID_card
 			models.User.objects.filter(username=username).delete()
 			new_username = request.POST.get('username').strip()
 			new_password1 = request.POST.get('password1').strip()
 			new_password2 = request.POST.get('password2').strip()
 			legal, message = checkout(new_username, new_password1, new_password2, email)
 			if not legal:
-				add_user(username, password, email)
+				user = add_user(username, password, email, real_name, ID_card, False)
+				request.session['id'] = user.id
 				return render(request, 'show_info.html', locals())
-			user = add_user(new_username, new_password1, email, False)
+			user = add_user(new_username, new_password1, email, real_name, ID_card, False)
 			request.session['id'] = user.id
 			username = user.username
 			password = user.password
@@ -233,12 +243,14 @@ def show_info(request):
 		return render(request, 'show_info.html', locals())
 
 
-def add_user(username, password, email, new_user = True):
+def add_user(username, password, email, real_name, ID_card, new_user=True):
 	user = models.User()
 	user.username = username
 	user.password = password
 	user.email = email
 	user.status = 1
+	user.real_name = real_name
+	user.ID_card = ID_card
 	if new_user:
 		user.status = 0
 		user.active_code = E.send_register_email(email)
@@ -310,16 +322,20 @@ def search_house(request):
 			user = models.User.objects.get(id=request.session.get('id'))
 			login_name = user.username
 			kind = 'User'
-	if request.session.get('kind') == 'CS':
+	elif request.session.get('kind') == 'CS':
 		if request.session.get('id'):
 			cs = models.Customerserver.objects.get(id=request.session.get('id'))
 			login_name = cs.username
 			kind = 'CS'
+	else:
+		kind = 'guest'
+		login_name = 'guest'
 	if request.method == 'POST':
 		key_word = request.POST.get('key_word')
 		houses = houses.filter(house_name__contains=key_word)
 		district = request.POST.get('district')
-		houses = houses.filter(district=district)
+		if district != '不限':
+			houses = houses.filter(district=district)
 		short_leasing = request.POST.get('short_leasing')
 		if short_leasing:
 			houses = houses.filter(short_leasing=True)
@@ -438,6 +454,46 @@ def user_info(request):
 			app.allowed_by = login_name
 			app.save()
 			message = "完成审核"
+			house = models.House.objects.get(house_id=app.house_id)
+			user = models.User.objects.get(username=app.username)
+			document = Document()
+			p = document.add_heading('房屋租赁合同', 0)
+			p.paragraph_format.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
+			p = document.add_paragraph('甲方：青年租房有限公司')
+			p = document.add_paragraph('乙方：' + str(user.real_name))
+			p = document.add_paragraph('双方经友好协商，根绝《合同法》及国家、当地政府对房屋租赁的有关规定，就租赁房屋一事达成以下协议：')
+			p.paragraph_format.first_line_indent = Inches(0.3)
+			p = document.add_paragraph('')
+			p.add_run('第一条 ').bold = True
+			p.add_run('甲方保证向乙方出租的房屋为合法拥有完全的所有权和使用权，乙方确保了解该房屋全貌，并以现状为准。')
+			p = document.add_paragraph('')
+			p.add_run('第二条 ').bold = True
+			p.add_run('出租房屋坐落于' + str(house.address) + '，室内附属设施齐全。')
+			p = document.add_paragraph('')
+			p.add_run('第三条 ').bold = True
+			p.add_run(
+				'租金每月人民币' + str(house.long_leasing_fee) + '元。' + '自' + str(app.s_y) + '年' + str(app.s_m) + '月' + str(
+					app.s_d) + '日起开始入住，' + '共' + str(app.duration) + '个月，租金每月支付一次；自本合同生效之日起，'
+				+ '乙方应先行向甲方支付一个月的租金，以后每月前一周内付清下月租金。租金以现金支付。')
+			p = document.add_paragraph('')
+			p.add_run('第四条 ').bold = True
+			p.add_run('租赁期间，乙方因正常生活之需要的煤气费、水电费、暖气费、有线电视费、网络使用费等均由乙方承担。')
+			p = document.add_paragraph('')
+			p.add_run('第五条 ').bold = True
+			p.add_run('租赁期间，乙方不得将房屋转租给第三方使用，否则，甲方有权单方面终止合同，收回房屋，且可以追究乙方的违约责任。')
+			p = document.add_paragraph('')
+			p.add_run('第六条 ').bold = True
+			p.add_run('本协议一式两份，甲、乙两方各存一份，均具有同等法律效力。')
+			p = document.add_paragraph('')
+			p.add_run('第七条 ').bold = True
+			p.add_run('本协议自双方签字之日起生效。')
+			p = document.add_paragraph('甲方：       ')
+			p.alignment = WD_PARAGRAPH_ALIGNMENT.RIGHT
+			p = document.add_paragraph('乙方：       ')
+			p.alignment = WD_PARAGRAPH_ALIGNMENT.RIGHT
+			p = document.add_paragraph('签约时间：       年     月     日')
+			p.alignment = WD_PARAGRAPH_ALIGNMENT.RIGHT
+			document.save('./static/applications/' + str(app.apply_id) + '.docx')
 	return render(request, 'user_info.html', {'message':message})
 
 
@@ -575,6 +631,41 @@ def arrange_repairing(request):
 	return render(request, 'manage_repairing.html', {'message': '安排错误'})
 
 
+def my_repairing(request):
+	if request.session.get('kind') == "user":
+		my_repairing = models.Repairing.objects.filter(username=models.User.objects.get(id=request.session.get('id')).username)
+		user = models.User.objects.get(id=request.session.get('id'))
+		login_name = user.username
+	else:
+		my_repairing = models.Repairing.objects.filter(repair_technician=models.Technician.objects.get(id=request.session.get('id')).username)
+		user = models.Technician.objects.get(id=request.session.get('id'))
+		login_name = user.username
+	if request.method == 'POST':
+		if request.POST.get('house_id'):
+			my_repairing = my_repairing.filter(house_id=request.POST.get('house_id'))
+	return render(request, 'my_repairing.html', {'my_repairing': my_repairing, "username": login_name, "kind": request.session.get('kind')})
+
+
+def comment(request):
+	my_repairing = None
+	if request.method == 'POST':
+		repairing = models.Repairing.objects.get(repair_id=request.POST.get('selected_id'))
+		repairing.comment = request.POST.get('comment')
+		repairing.save()
+		my_repairing = models.Repairing.objects.filter(username=models.User.objects.get(id=request.session.get('id')).username)
+	return render(request, 'my_repairing.html', {'my_repairing': my_repairing, "message": "评价成功"})
+
+
+def fix(request):
+	my_repairing = None
+	if request.method == 'POST':
+		repairing = models.Repairing.objects.get(repair_id=request.POST.get('selected_id'))
+		repairing.is_fix = True
+		repairing.save()
+		my_repairing = models.Repairing.objects.filter(username=models.User.objects.get(id=request.session.get('id')).username)
+	return render(request, 'my_repairing.html', {'my_repairing': my_repairing, "message": "处理成功"})
+
+
 def send_message(request):
 	message = ""
 	if request.method == 'POST':
@@ -630,149 +721,16 @@ def create_apply(request):
 	return render(request, 'create_apply.html', {'message': message})
 
 
-def reporting(request):
-	message = ""
-	user = models.User.objects.get(id=request.session.get('id'))
-	if request.method == 'POST':
-		if request.POST.get('apply_id'):
-			apply_id = request.POST.get('apply_id')
-			request.session['apply_id'] = apply_id
-		if request.POST.get('title'):
-			print(2)
-			title = request.POST.get('title')
-		if request.POST.get('content'):
-			print(3)
-			content = request.POST.get('content')
-			files = request.FILES.getlist('picture', None)
-			if files:
-				for file in files:
-					if not str(file.name).__contains__("jpg"):
-						return render(request, 'reporting.html', {"message": "图片仅支持jpg格式"})
-			else:
-				return render(request, 'reporting.html', {"message": "请上传图片"})
-			if not content:
-				return render(request, 'reporting.html', {"message": "报修原因不能为空"})
-			report = models.Reporting()
-			report.username = user.username
-			apply_id = request.session.get('apply_id')
-			report.apply_id = apply_id
-			report.title = title
-			report.content = content
-			report.save()
-			report.picture = "/demo1/" + "report_" + str(apply_id) + "_" + str(report.report_id) + "/"
-			os.makedirs(settings.MEDIA_ROOT + "/demo1/" + "report_" + str(apply_id) + "_" + str(report.report_id) + "/")
-			i = 1
-			for file in files:
-				filename = settings.MEDIA_ROOT + "/demo1/"+ "report_" + str(apply_id) + "_" + str(report.report_id) + "/" + str(i) + ".jpg"
-				with open(filename, 'wb') as pic:
-					for c in file.chunks():
-						pic.write(c)
-				i += 1
-			report.pic_num = i - 1
-			report.save()
-			return render(request, 'reporting.html', {"message": "添加成功"})
-	return render(request, 'reporting.html', {'message': message})
-
-
-def my_reporting(request):
-	report = models.Reporting.objects.all()
-	login_name = ""
-	if request.session.get('id'):
-		user = models.User.objects.get(id=request.session.get('id'))
-		login_name = user.username
-	report = report.filter(username=login_name)
-	return render(request, 'my_reporting.html', {'reports': report})
-
-
-def manage_reporting(request):
-	report = models.Reporting.objects.all()
-	login_name = ""
-	if request.session.get('id'):
-		cs = models.Customerserver.objects.get(id=request.session.get('id'))
-		login_name = cs.username
-	if request.method == 'POST':
-		if request.POST.get('not_handled'):
-			report = report.filter(status=0)
-		if request.POST.get('report_id'):
-			report= report.filter(repair_id=request.POST.get('report_id'))
-		if request.POST.get('username'):
-			report = report.filter(username=request.POST.get('username'))
-	return render(request, 'manage_reporting.html', {"login_name": login_name, "reports": report})
-
-
-def handle_reporting(request):
-	login_name = ""
-	if request.session.get('id'):
-		cs = models.Customerserver.objects.get(id=request.session.get('id'))
-		login_name = cs.username
-	if request.method == 'POST':
-		if request.POST.get('report_id'):
-			request.session['report_id'] = request.POST.get('report_id')
-			report = models.Reporting.objects.get(report_id=request.session.get('report_id'))
-		if request.POST.get('content'):
-			report = models.Reporting.objects.get(report_id=request.session.get('report_id'))
-			report.status = 1
-			report.handled_by = login_name
-			report.save()
-			new_message = models.MyMessage()
-			new_message.receiver = report.username
-			new_message.status = 1
-			new_message.sender = login_name
-			new_message.context = "您的投诉ID为"+str(report.report_id) + "的投诉已由客服" + str(login_name) + "处理。内容如下：" + request.POST.get('content')
-			new_message.title = "投诉结果通知"
-			new_message.save()
-			report.handled_content = new_message.context
-			report.save()
-			return render(request, 'handle_reporting.html', {'message': '处理成功', 'report': report})
-	return render(request, 'handle_reporting.html', {'report': report})
-
-
-def export_app(request):
-	login_name = ""
-	if request.session.get('id'):
-		user = models.User.objects.get(id=request.session.get('id'))
-		login_name = user.username
-	if request.method == 'POST':
-		app = models.Application.objects.get(apply_id=request.POST.get('apply_id'))
-		house = models.House.objects.get(house_id=request.POST.get('house_id'))
-		document = Document()
-		p = document.add_heading('房屋租赁合同', 0)
-		p.paragraph_format.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
-		p = document.add_paragraph('甲方：青年租房有限公司')
-		p = document.add_paragraph('乙方：'+str(user.username))
-		p = document.add_paragraph('双方经友好协商，根绝《合同法》及国家、当地政府对房屋租赁的有关规定，就租赁房屋一事达成以下协议：')
-		p.paragraph_format.first_line_indent = Inches(0.3)
-		p = document.add_paragraph('')
-		p.add_run('第一条 ').bold = True
-		p.add_run('甲方保证向乙方出租的房屋为合法拥有完全的所有权和使用权，乙方确保了解该房屋全貌，并以现状为准。')
-		p = document.add_paragraph('')
-		p.add_run('第二条 ').bold = True
-		p.add_run('出租房屋坐落于'+str(house.address)+'，室内附属设施齐全。')
-		p = document.add_paragraph('')
-		p.add_run('第三条 ').bold = True
-		p.add_run('租金每月人民币'+str(house.long_leasing_fee)+'元。'+'自'+str(app.s_y)+'年'+str(app.s_m)+'月'+str(app.s_m)+'日起开始入住，'+'共'+ str(app.duration) + '个月，租金每月支付一次；自本合同生效之日起，'
-					+ '乙方应先行向甲方支付一个月的租金，以后每月前一周内付清下月租金。租金以现金支付。')
-		p = document.add_paragraph('')
-		p.add_run('第四条 ').bold = True
-		p.add_run('租赁期间，乙方因正常生活之需要的煤气费、水电费、暖气费、有线电视费、网络使用费等均由乙方承担。')
-		p = document.add_paragraph('')
-		p.add_run('第五条 ').bold = True
-		p.add_run('租赁期间，乙方不得将房屋转租给第三方使用，否则，甲方有权单方面终止合同，收回房屋，且可以追究乙方的违约责任。')
-		p = document.add_paragraph('')
-		p.add_run('第六条 ').bold = True
-		p.add_run('本协议一式两份，甲、乙两方各存一份，均具有同等法律效力。')
-		p = document.add_paragraph('')
-		p.add_run('第七条 ').bold = True
-		p.add_run('本协议自双方签字之日起生效。')
-		p = document.add_paragraph('甲方：       ')
-		p.alignment = WD_PARAGRAPH_ALIGNMENT.RIGHT
-		p = document.add_paragraph('乙方：       ')
-		p.alignment = WD_PARAGRAPH_ALIGNMENT.RIGHT
-		p = document.add_paragraph('签约时间：       年     月     日')
-		p.alignment = WD_PARAGRAPH_ALIGNMENT.RIGHT
-		document.save('./static/applications/'+str(app.apply_id)+'.docx')
-
-	return render(request, 'my_app.html', {'message': '导出成功'})
+# def export_app(request):
+# 	login_name = ""
+# 	if request.session.get('id'):
+# 		user = models.User.objects.get(id=request.session.get('id'))
+# 		login_name = user.username
+# 	if request.method == 'POST':
+# 		app = models.Application.objects.get(apply_id=request.POST.get('apply_id'))
+# 		house = models.House.objects.get(house_id=request.POST.get('house_id'))
+#
+# 	return render(request, 'my_app.html', {'message': '导出成功'})
 
 
 def download_app(request):
@@ -796,10 +754,9 @@ def remind(request):
 		now = datetime.datetime.now().date()
 		for app in apps:
 			dt = datetime.date(app.s_y, app.s_m, app.s_d)
-			print(dt)
 			delta = now - dt
 			days = delta.days
-			if days%30 == 23:
+			if days % 30 == 23:
 				new_message = models.MyMessage()
 				new_message.receiver = app.username
 				new_message.status = 1
@@ -808,5 +765,47 @@ def remind(request):
 				new_message.context = "您的订单ID为" + str(app.apply_id) + "的订单近期该缴费了。每月租金为：" + str(house.long_leasing_fee)
 				new_message.title = "缴费通知"
 				new_message.save()
-
+				E.send_remind_email(models.User.objects.get(username=app.username).email, new_message.context)
 		return render(request, 'check_app.html', {'apps': apps, "csname": login_name})
+
+
+def check_user(request):
+	users = models.User.objects.filter()
+	if request.method == 'POST':
+		if request.POST.get('delete_name'):
+			user = models.User.objects.get(username=request.POST.get('delete_name'))
+			user.delete()
+			users = models.User.objects.filter()
+			return render(request, 'check_user.html', {'users': users, 'message': "删除成功"})
+		elif request.POST.get('selected_name'):
+			user = models.User.objects.get(username=request.POST.get('selected_name'))
+			return render(request, 'CS_show_info.html', {'user': user})
+		else:
+			if request.POST.get('username'):
+				users = users.filter(username=request.POST.get('username'))
+			if request.POST.get('user_id'):
+				users = users.filter(id=request.POST.get('user_id'))
+			return render(request, 'check_user.html', {'users': users})
+	return render(request, 'check_user.html', {'users': users})
+
+
+def CS_change_info(request):
+	if request.method == 'POST':
+		username = models.User.objects.get(id=request.session.get('id')).username
+		password = models.User.objects.get(id=request.session.get('id')).password
+		email = models.User.objects.get(id=request.session.get('id')).email
+		real_name = models.User.objects.get(id=request.session.get('id')).real_name
+		ID_card = models.User.objects.get(id=request.session.get('id')).ID_card
+		models.User.objects.filter(username=username).delete()
+		new_username = request.POST.get('username').strip()
+		new_password1 = request.POST.get('password1').strip()
+		new_password2 = request.POST.get('password2').strip()
+		legal, message = checkout(new_username, new_password1, new_password2, email)
+		if not legal:
+			user = add_user(username, password, email, real_name, ID_card, False)
+			return render(request, 'CS_show_info.html', locals())
+		user = add_user(new_username, new_password1, email, real_name, ID_card, False)
+		message = '修改成功'
+		return render(request, 'check_user.html', locals())
+	else:
+		return render(request, 'CS_show_info.html', locals())

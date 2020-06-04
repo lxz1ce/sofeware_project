@@ -9,6 +9,7 @@
         {% csrf_token %}
         搜索：<input type="text" name="key_word"/>
         区域:<select name="district">
+        <option value="不限">不限</option>
         <option value="东城区">东城区</option>
         <option value="西城区">西城区</option>
         <option value="朝阳区">朝阳区</option>
@@ -48,11 +49,13 @@
                 <td>{{ house.contact_number }}</td>
                 <td>房屋状态：{{ house.status }}</td>
             </tr>
+            {% if kind != 'guest' %}
             <form action="/specific_info/" method="post">
                 {% csrf_token %}
                 <input name="selected_id" type="hidden" value="{{house.house_id}}">
                 <input type="submit" value="查看该房源"/>
             </form>
+            {% endif %}
             {% if kind == 'CS' %}
                 <form action="/delete_house/" method="post">
                 {% csrf_token %}

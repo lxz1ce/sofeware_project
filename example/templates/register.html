@@ -7,119 +7,330 @@
     <title>注册</title>
     <style>
         .bk{
-            background-color:rgb(170, 170, 170)
+            background-image: url("../static/images/background.jpg");
+            background-size: 100% 100%;
+            background-attachment: fixed;
         }
         .white{
-            color:white;
+            color:gray;
         }
     </style>
 </head>
-<body class="bk">
+<body class="bk logobg_style">
+    <div id="large-header" style="margin-top:70px">
+        <div  class="container">
+            <canvas id="demo-canvas" width="2000" height="800" style="z-index: -1; position: absolute; margin-top: -70px;"></canvas>
+            <form action="/register/" method="post" role="form">
+                {% csrf_token %}
+                <h1 class="white" style="text-align: center;">用户注册</h1>
+                <div class="row">
+                    <div class="col-md-6 col-md-offset-3 form-group">
+                        <label class="white"><span>请输入用户名</span></label><br/>
+                        <input type="text" id="username" name="username" class ="form-control" required="required" placeholder="输入您的用户名"/>
+                    <br/>
+                    </div>
+                </div>
     
-    <div class="container"  style="margin-top:70px">
-        <div class="navbar navbar-inverse navbar-fixed-top position:fixed">
-            <a href="#" class="navbar-brand text-align='center'">青年租房管理系统</a>
-        </div>
-        <form action="/register/" method="post" role="form">
-            {% csrf_token %}
-            <h1 class="white" style="text-align: center;">用户注册</h1>
-            <div class="row">
-                <div class="col-md-6 col-md-offset-3">
-                    <label style="text-align: center;"><span class="white" >请输入用户名</span></label><br/>
-                    <input type="text" name="username" class ="form-control" required="required" placeholder="输入您的用户名"/>
-                <br/>
+                <div class="row">
+                    <div class="col-md-6 col-md-offset-3 text-align:center form-group">
+                        <label class="white"><span>请输入密码</span></label><br/>
+                        <input id="password1" type="password" name="password1" class ="form-control" required="required" placeholder="输入您的密码"/>
+                        <br/>
+                    </div>
                 </div>
-            </div>
-
-            <div class="row">
-                <div class="col-md-6 col-md-offset-3 text-align:center from-group">
-                    <label style="text-align: center;"><span class="white" >请输入密码</span></label><br/>
-                    <input id="password1" type="password" name="password1" class ="form-control" required="required" placeholder="输入您的密码"/>
-                    <br/>
+    
+                <div class="row">
+                    <div class="col-md-6 col-md-offset-3 text-align:center form-group">
+                        <label class="white"><span>请确认密码</span></label><br/>
+                        <input id="password2" type="password" name="password2" class ="form-control" required="required" placeholder="确认您的密码" onkeyup="validate()"/>
+                        <span id="tishi" ></span>
+                        <br/>
+                    </div>
                 </div>
-            </div>
-
-            <div class="row">
-                <div class="col-md-6 col-md-offset-3 text-align:center from-group">
-                    <label style="text-align: center;"><span class="white" >请确认密码</span></label><br/>
-                    <input id="password2" type="password" name="password2" class ="form-control" required="required" placeholder="确认您的密码" onkeyup="validate()"/>
-                    <span id="tishi"></span>
-                    <br/>
+    
+                <div class="row">
+                    <div class="col-md-6 col-md-offset-3 text-align:center from-group">
+                        <label class="white"><span>请输入真实姓名</span></label><br/>
+                        <input type="text" name="real_name" class ="form-control" required="required" placeholder="输入您的真实姓名"/>
+                        <br/>
+                    </div>
                 </div>
-            </div>
-
-            <div class="row">
-                <div class="col-md-6 col-md-offset-3 text-align=center form-group">
-                    <label style="text-align: center;"><span class="white" >请输入邮箱</span></label><br/>
-                    <input type="email" name="email" class ="form-control" required="required" placeholder="输入您的邮箱"/>
-                <br/>
+    
+                <div class="row">
+                    <div class="col-md-6 col-md-offset-3 text-align:center from-group">
+                        <label class="white"><span>请输入身份证号</span></label><br/>
+                        <input type="text" id="ID_card" name="ID_card" class ="form-control" required="required" placeholder="输入您的身份证号" onkeyup="checkIDnum()"/>
+                        <!-- <span id="tishiIdNum" style="color:red; display: inline;" >身份证格式错误</span> -->
+                        <br/>
+                    </div>
                 </div>
-            </div>
-
-            <div class="row">
-                <div class="col-md-6 col-md-offset-3 ">
-                    <label style="text-align: center;"><span class="white" >我是客服</span><br/></label>
-                    <input type="checkbox" id="is_CS" name="is_CS" class ="form-control" onclick="show()"/>
-                    <br>
+    
+                <div class="row">
+                    <div class="col-md-6 col-md-offset-3 form-group">
+                        <label class="white"><span>我是客服</span></label>
+                        <input type="checkbox" id="is_CS" name="is_CS" onclick="show()"/>
+                        <br/><br/>
+                    </div>
                 </div>
-            </div>
-            
-            
-            <div class="row" id="keyShow" name="keyShow" style="display: none;" >
-                <div class="col-md-6 col-md-offset-3 text-align='center' ">
-                    <label style="text-align: center;"><span class="white" >请输入密钥</span></label><br/> 
-                    <input type="text" name="CS_key" class="form-control" placeholder="请输入密钥:"/>
-                    <br/>
-                </div>
-            </div>
-            
-            <div class="row" style="text-align: center;">
-                <button id="submitButton" type="submit" class="btn btn-default">提交</button>
-            </div>
-            
-            <div class="row">
-                <span class="col-md-3 col-md-offset-4 ">
-                    <a href="../">back to home</a>
-                </span>
-                <span class="col-md-2">
-                    <a href="../login">go to login</a>
-                </span>
                 
-            </div>
+                <div class="row">
+                    <div class="col-md-6 col-md-offset-3 text-align=center form-group" style="display: block" id="emails">
+                        <label class="white"><span>请输入邮箱</span></label><br/>
+                        <input type="email" id="email" name="email" class ="form-control" placeholder="请输入您的邮箱" onkeyup="forbidden()"/ ><br>
+                        <span id="tishiemail" style="color:red; display: inline;" >未输入邮箱</span>
+                    <br/>
+                    </div>
+                </div>
+                
+                <div class="row" id="keyShow" name="keyShow" style="display: none;" >
+                    <div class="col-md-6 col-md-offset-3 form-group ">
+                        <label class="white"><span>请输入密钥</span></label><br/> 
+                        <input type="text" id="CS_key" name="CS_key" class="form-control" placeholder="请输入密钥:"/>
+                        <br/>
+                    </div>
+                </div>
+                
+                <div class="row" style="text-align: center;">
+                    <div class="form-group">
+                        <button id="submitButton" type="submit" class="btn btn-default" >提交</button>
+                    </div>
+                </div>
+            </form>
+                <div class="row">
+                    <span class="col-md-3 col-md-offset-4 ">
+                        <a href="../">首页</a>
+                    </span>
+                    <span class="col-md-2">
+                        <a href="../login">登陆</a>
+                    </span>
+                    
+                </div>
             
-            {% if message %}
-                <script type="text/javascript">
-                    alert("{{ message }}");
-                </script>
-            {% endif %}
+                
+                {% if message %}
+                    <script type="text/javascript">
+                        alert("{{ message }}");
+                    </script>
+                {% endif %}
+        </div>
     </div>
     
+    <script>
+        var usr = document.getElementById('username').value;
+        var pwd1 = document.getElementById('password1').value;
+        var pwd2 = document.getElementById('password2').value;
+        var eml = document.getElementById('email').value;
+        if(usr==''||pwd1==''||pwd2==''||eml=='')
+        {
+            document.getElementById("submitButton").disabled = true;
+        }
+    </script>
+    <script src="../static/js/TweenLite/TweenLite.min.js"></script>
+    <script src="../static/js/TweenLite/EasePack.min.js"></script>
+    <script src="../static/js/TweenLite/rAF.js"></script>
+    <script src="../static/js/TweenLite/demo-1.js"></script>
 </body>
 <script>
     function validate() {
+        var key = document.getElementById("is_CS").checked;
+        var usr = document.getElementById('username').value;
         var pwd1 = document.getElementById("password1").value;
         var pwd2 = document.getElementById("password2").value;
-        if(pwd1 == pwd2)
-         {
-            document.getElementById("tishi").innerHTML="<font color='green'>两次密码相同</font>";
-            document.getElementById("submitButton").disabled = false;
-         }
-    else {
-            document.getElementById("tishi").innerHTML="<font color='red'>两次密码不相同</font>";
-            document.getElementById("submitButton").disabled = true;
-         }
+        var eml = document.getElementById('email').value;
+        if(key!=true)
+        {
+            if(pwd1 == pwd2)
+            {
+                document.getElementById("tishi").innerHTML="<font color='green'>两次密码相同</font>";
+                if(!(usr==''||pwd1==''||pwd2==''||eml==''))
+                {
+                    document.getElementById("submitButton").disabled = false;
+                }
+            }
+            else {
+                document.getElementById("tishi").innerHTML="<font color='red'>两次密码不相同</font>";
+                document.getElementById("submitButton").disabled = true;
+            }
+        }
+        else
+        {
+            if(pwd1 == pwd2)
+            {
+                document.getElementById("tishi").innerHTML="<font color='green'>两次密码相同</font>";
+                if(!(usr==''||pwd1==''||pwd2==''))
+                {
+                    document.getElementById("submitButton").disabled = false;
+                }
+            }
+            else {
+                document.getElementById("tishi").innerHTML="<font color='red'>两次密码不相同</font>";
+                document.getElementById("submitButton").disabled = true;
+            }
+        }
     }
 </script>
 <script>
     function show(){
         var key = document.getElementById("is_CS").checked;
+        var usr = document.getElementById('username').value;
+        var pwd1 = document.getElementById("password1").value;
+        var pwd2 = document.getElementById("password2").value;
+        var eml = document.getElementById('email').value;
         if(key==true)
         {
+            if(!(usr==''||pwd1==''||pwd2==''))
+            {
+                document.getElementById("submitButton").disabled = false;
+            }
+            else{
+                document.getElementById("submitButton").disabled = true;
+            }
             document.getElementById('keyShow').style.display='block';
+            document.getElementById('emails').style.display='none';
         }
         else{
+            if(!(usr==''||pwd1==''||pwd2==''||eml==''))
+            {
+                document.getElementById("submitButton").disabled = false;
+            }
+            else{
+                document.getElementById("submitButton").disabled = true;
+            }
             document.getElementById('keyShow').style.display='none';
+            document.getElementById('emails').style.display='block';
         }
     }
+</script>
+<script>
+    function forbidden()
+    {
+        var usr = document.getElementById('username').value;
+        var pwd1 = document.getElementById("password1").value;
+        var pwd2 = document.getElementById("password2").value;
+        var eml = document.getElementById('email').value;
+        if(eml==''){
+            document.getElementById('tishiemail').style.display='inline';
+            document.getElementById("submitButton").disabled = true;
+        }
+        else if(usr==''||pwd1==''||pwd2=='')
+        {
+            document.getElementById('tishiemail').style.display='none';
+            document.getElementById("submitButton").disabled = true;
+        }
+        else{
+            document.getElementById('tishiemail').style.display='none';
+            document.getElementById("submitButton").disabled = false;
+        }
+    }
+</script>
+<script>
+    	function checkIDnum(){
+        var ids=document.getElementById("ID_card");
+		if(ids.length()!=18) {
+			document.getElementById("tishiIdNum").style.display="inline";
+		}
+		for(var i = 0 ;i < ids.length() ; i++)
+		{
+			if(i<ids.length()-1) 
+			{
+				if(!Character.isDigit(ids.charAt(i)))
+				{
+					document.getElementById("tishiIdNum").style.display="inline";
+				}
+			}
+			else if(i==ids.length()-1)
+			{
+				if(!(ids.charAt(i)=='X')&&!(ids.charAt(i)=='x')&&(!Character.isDigit(ids.charAt(i))))
+				{
+					document.getElementById("tishiIdNum").style.display="inline";
+				}
+			}
+		}
+		if(Character.isLetter(ids.charAt(ids.length()-1)))
+		{
+			var ans=0;
+			for(var j=0;j<ids.length()-1;j++)
+			{
+				var sum=Math.pow(2, 17-j)%11;
+				ans+=sum*(ids.charAt(j)-'0');
+			}
+			var sum=Math.pow(2,0)%11;
+			ans+=sum*(10);
+			if(ans%11!=1)
+			{
+				return false;
+			}
+		}
+		else if(Character.isDigit(ids.charAt(ids.length()-1))) {
+			var ans=0;
+			for(var j=0;j<ids.length();j++)
+			{
+				var sum=Math.pow(2, 17-j)%11;
+				ans+=sum*(ids.charAt(j)-'0');
+			}
+			if(ans%11!=1)
+			{
+				document.getElementById("tishiIdNum").style.display="inline";
+			}
+		}
+		var temp0=0;//年
+		for(var i=6;i<10;i++)
+		{
+			temp0*=10;
+			temp0+=(ids.charAt(i)-'0');
+			
+		}
+		if(temp0<1900)
+		{
+			document.getElementById("tishiIdNum").style.display="inline";
+		}
+		var temp=0;//月
+		for(var i = 10;i<12;i++)
+		{
+			temp*=10;
+			temp+=(ids.charAt(i)-'0');
+			
+		}
+		if(temp<1||temp>12)
+		{
+			document.getElementById("tishiIdNum").style.display="inline";
+		}
+		var temp1=0;//日
+		for(var i = 12;i<14;i++)
+		{
+			temp1*=10;
+			temp1+=(ids.charAt(i)-'0');
+		}
+		if(temp==1||temp==3||temp==5||temp==7||temp==8||temp==10||temp==12)
+		{
+			if(temp1<1||temp1>31)
+			{
+				document.getElementById("tishiIdNum").style.display="inline";
+			}
+		}
+		else if(temp!=2)
+		{
+			if(temp1<1||temp>30)
+			{
+				document.getElementById("tishiIdNum").style.display="inline";
+			}
+		}
+		else {
+			if(IDNum.isLeapYear(temp0)) {
+				if(temp1<1||temp1>29)
+				{
+					document.getElementById("tishiIdNum").style.display="inline";
+				}
+			}
+			else
+			{
+				if(temp1<1||temp1>28)
+				{
+					document.getElementById("tishiIdNum").style.display="inline";
+				}
+			}
+		}
+		document.getElementById("tishiIdNum").style.display="none";
+	}
 </script>
 </html>

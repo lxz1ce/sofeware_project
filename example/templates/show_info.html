@@ -1,24 +1,108 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>个人信息</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css"> 
+    <title>Document</title>
+    <style>
+        .navbar {
+            margin-bottom: 0;
+            position: fixed;
+            left: 0;
+            right: 0;
+        }
+
+        .sidebar {
+            left:0px;
+            padding-top: 30px;
+            padding: 0;
+            position: fixed;
+            top: 52px;
+            bottom: 0;
+            text-align: center;
+            box-shadow: 3px 3px 3px rgba(170,170,170,0.3);
+        }
+
+        .content {
+            position: fixed;
+            top: 52px;
+            right: 0;
+            bottom: 0;
+            overflow: scroll;
+        }
+    </style>
 </head>
 <body>
-    <form action="/show_info/" method="post">
-        {% csrf_token %}
-        用户名<input type="text" name="username" value="{{ username }}"/>
-        <br/>
-        密码<input type="text" name="password1" value="{{ password }}"/>
-        <br/>
-        再次输入密码(若修改)<input type="text" name="password2"/>
-        <br/>
-        邮箱(不可修改)<input value="{{ email }}" readonly/>
-        <br/>
-        <button type="submit">提交</button>
-        <br/>
-        <a href="../main">返回</a>
-    </form>
+    <div class="navbar navbar-inverse navbar-fixed-top" style="position: fixed;background:#2a65bd">
+        <a href="#" class="navbar-brand text-align='center'"><span font face="黑体" style="color:white ;">青年租房管理系统</span></a>
+    </div>
+    <div class="container">
+        <div class="row">
+           <div id="sidebar-collapse" class="col-sm-3 col-lg-2 sidebar collapse in" style="z-index:3">
+                <ul class="nav menu" >
+                    <li class="active"><a href="../main">主页</a></li>
+                    <li><a href="../my_message">我的消息</a></li>
+                    <li><a href="../show_info">个人中心</a></li>
+                    <li><a href="#">VB.Net</a></li>
+                    <li><a href="#">Java</a></li>
+                    <li><a href="#">PHP</a></li>
+                </ul>
+                <HR style="FILTER: alpha(opacity=100,finishopacity=0,style=3)" width="80%" color=#987cb9 SIZE=3>
+            </div>
+            <div class="col-md-10 content pull-right" style="margin-top: 10px;">
+                <form action="/show_info/" method="post" role="form">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-6 col-md-offset-2 form-group">
+                            <label>用户名</label><br>
+                            <input type="text" name="username" class ="form-control" value="{{ username }}"/>
+                            <br/>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 col-md-offset-2 form-group">
+                            <label>
+                                密码<
+                            </label>br>
+                            <input type="password" name="password1" class ="form-control" value="{{ password }}"/>
+                            <br/>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 col-md-offset-2 form-group">
+                            <label>
+                                再次输入密码(若修改)
+                            </label><br>
+                            <input type="password" class ="form-control" name="password2"/>
+                            <br/>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 col-md-offset-2 form-group">
+                            <label>
+                                邮箱(不可修改)
+                            </label><br>
+                            <input class ="form-control" value="{{ email }}" readonly/>
+                            <br/>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 col-md-offset-2 form-group">
+                            <button type="submit"  class="btn btn-default">提交</button>
+                            <br/>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 col-md-offset-2 form-group">
+                            <a href="../main">返回</a>
+                        </div>
+                    </div>
+                    
+                </form>
+            </div>
+        </div>
+    </div>
     {% if message %}
         <script type="text/javascript">
             alert("{{ message }}");

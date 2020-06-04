@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>用户信息</title>
+</head>
+<body>
+    <form action="/CS_change_info/" method="post">
+        {% csrf_token %}
+        用户名<input type="text" name="username" value="{{ user.username }}"/>
+        <br/>
+        密码<input type="text" name="password1" value="{{ user.password }}"/>
+        <br/>
+        再次输入密码(若修改)<input type="text" name="password2"/>
+        <br/>
+        邮箱(不可修改)<input value="{{ user.email }}" readonly/>
+        <br/>
+        真实姓名(不可修改)<input value="{{ user.real_name }}" readonly/>
+        <br/>
+        身份证号(不可修改)<input value="{{ user.ID_card }}" readonly/>
+        <br/>
+        <button type="submit">修改</button>
+        <br/>
+        <a href="../check_user">返回</a>
+    </form>
+    {% if message %}
+        <script type="text/javascript">
+            alert("{{ message }}");
+        </script>
+    {% endif %}
+</body>
+</html>

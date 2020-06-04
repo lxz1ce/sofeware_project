@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>我的工单</title>
+</head>
+<body>
+    <form action="/my_repairing/" method="post">
+        {% csrf_token %}
+        搜索房源ID：<input type="text" name="house_id"/>
+        <input type="submit"/>
+    </form>
+    <a href="../main">返回</a>
+    <br/>
+    {% if kind == "user" %}
+        {% if my_repairing %}
+            {% for i in my_repairing %}
+                <tr>
+                    <td>repairing_id:{{ i.repair_id }} </td>
+                    <td>house_id:{{ i.house_id }} </td>
+                    <td>is_allowed:{{ i.is_allow }} </td>
+                    <td>is_fixed:{{ i.is_fix }} </td>
+                    <td>content:{{ i.content }} </td>
+                    {% if i.is_allow == True %}
+                        <td>fixing_by:{{ i.repair_technician }} </td>
+                    {% endif %}
+                    {% if i.is_fix == True %}
+                        {% if i.comment == 4 %}
+                            <form action="/comment/" method="post">
+                                {% csrf_token %}
+                                <input type="hidden" name="selected_id" value="{{ i.repair_id }}" checked/>
+                                <br/>
+                                <input type="radio" name="comment" value=0 checked/>不满意
+                                <br/>
+                                <input type="radio" name="comment" value=1 checked/>不太满意
+                                <br/>
+                                <input type="radio" name="comment" value=2 checked/>基本满意
+                                <br/>
+                                <input type="radio" name="comment" value=3 checked/>十分满意
+                                <br/>
+                                <input type="submit" value="评价"/>
+                            </form>
+                        {% endif %}
+                        {% if i.comment != 4 %}
+                            <td>comment:{{ i.comment }} </td>
+                        {% endif %}
+                    {% endif %}
+                </tr>
+                <br/>
+            {% endfor %}
+        {% endif %}
+    {% elif kind == "tech" %}
+        {% if my_repairing %}
+            {% for i in my_repairing %}
+                <tr>
+                    <td>repairing_id:{{ i.repair_id }} </td>
+                    <td>house_id:{{ i.house_id }} </td>
+                    <td>is_allowed:{{ i.is_allow }} </td>
+                    <td>is_fixed:{{ i.is_fix }} </td>
+                    <td>title:{{ i.title }} </td>
+                    <td>content:{{ i.content }} </td>
+                    {% if i.is_fix == True %}
+                        {% if i.comment == 4 %}
+                            <td>用户尚未评价 </td>
+                        {% endif %}
+                        {% if i.comment != 4 %}
+                            <td>comment:{{ i.comment }} </td>
+                        {% endif %}
+                    {% else %}
+                        <form action="/fix/" method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="selected_id" value="{{ i.repair_id }}" checked/>
+                            <input type="submit" value="已修理"/>
+                        </form>
+                    {% endif %}
+                </tr>
+                <br/>
+            {% endfor %}
+        {% endif %}
+
+    {% endif %}
+    {% if message %}
+        <script type="text/javascript">
+            alert("{{ message }}");
+        </script>
+    {% endif %}
+</body>
+</html>

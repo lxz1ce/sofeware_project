@@ -8,6 +8,8 @@ from django.db import models
 class User(models.Model):
 	username = models.CharField(max_length = 10, unique = True)
 	password = models.CharField(max_length = 15)
+	real_name = models.CharField(max_length = 15)
+	ID_card = models.CharField(max_length = 18)
 	email = models.EmailField()
 	status_choice = [(0, '申请中'), (1, '已通过')]
 	status = models.IntegerField(choices=status_choice, verbose_name='审核状态')
@@ -92,10 +94,13 @@ class Repairing(models.Model):
 	username = models.CharField(max_length=10)
 	house_id = models.IntegerField()
 	is_allow = models.BooleanField(default=False)
+	is_fix = models.BooleanField(default=False)
 	repair_technician = models.CharField(max_length=10)
 	content = models.CharField(max_length=200)
 	picture = models.ImageField('照片', upload_to='demo1/', blank=True, null=True)
 	pic_num = models.IntegerField(default=0)
+	comment_choice = [(0, '不满意'), (1, '不太满意'), (2, '基本满意'), (3, '十分满意'), (4, '未评价')]
+	comment = models.IntegerField(choices=comment_choice, verbose_name='评价', default=4)
 
 	def __str__(self):
 		return str(self.repair_id)
@@ -107,15 +112,9 @@ class Repairing(models.Model):
 class Reporting(models.Model):
 	report_id = models.AutoField(primary_key=True)
 	username = models.CharField(max_length=10)
-	apply_id = models.IntegerField()
-	title = models.CharField(max_length=40)
+	bad_user = models.CharField(max_length=10)
+	house_id = models.IntegerField()
 	content = models.CharField(max_length=200)
-	picture = models.ImageField('照片', upload_to='demo1/', blank=True, null=True)
-	pic_num = models.IntegerField(default=0)
-	status_choice = [(0, '待处理'), (1, '已处理')]
-	status = models.IntegerField(choices=status_choice, verbose_name='处理状态', default=0)
-	handled_by = models.CharField(max_length=10, blank=True, null=True)
-	handled_content = models.CharField(max_length=200, blank=True, null=True)
 
 	def __str__(self):
 		return str(self.report_id)

@@ -23,15 +23,19 @@
         <br/>
         <a href="../manage_repairing">管理保修</a>
         <br/>
-        <a href="../manage_reporting">管理投诉</a>
+        <a href="../check_user">查看用户</a>
         <br/>
     {% endif %}
     {% if kind == "user" %}
         <a href="../my_app">我的租房申请</a>
         <br/>
-        <a href="../my_reporting">我的投诉</a>
-        <br/>
         <a href="../my_message">我的消息{{ unread }}</a>
+        <br/>
+        <a href="../my_repairing">我的工单</a>
+        <br/>
+    {% endif %}
+    {% if kind == "tech" %}
+        <a href="../my_repairing">我的工单</a>
         <br/>
     {% endif %}
     <a href="../logout">logout</a>
