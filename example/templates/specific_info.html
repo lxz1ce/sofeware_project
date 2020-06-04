@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="zn">
+<head>
+    <meta charset="UTF-8">
+    <title>房源信息</title>
+</head>
+<body>
+     {% if house %}
+            <tr>
+                <td>{{ house.house_name }}</td>
+                <td>{{ house.short_leasing }}</td>
+                <td>{{ house.short_leasing_fee }}</td>
+                <td>{{ house.long_leasing }}</td>
+                <td>{{ house.long_leasing_fee }}</td>
+                <td>{{ house.house_type }}</td>
+                <td>{{ house.district }}</td>
+                <td>{{ house.address }}</td>
+                <td>{{ house.contact_number }}</td>
+            </tr>
+            <form action="/specific_info/" method="post">
+                {% csrf_token %}
+                {% if house.short_leasing %}
+                    短租<input name="type" type="radio" value="short"/>
+                    起始时间<input name="s_y" type="number"/>年<input name="s_m" type="number">月<input name="s_d" type="number">日
+                    租房时长<input name="duration" type="number"/>天
+
+                {% endif %}
+                {% if house.long_leasing %}
+                    长租<input name="type" type="radio" value="long"/>
+                    起始时间<input name="s_y" type="number"/>年<input name="s_m" type="number">月<input name="s_d" type="number">日
+                    租房时长<input name="duration" type="number"/>月
+                {% endif %}
+                <input name="selected_id" type="hidden" value="{{house.house_id}}">
+                <input type="submit" value="确认租房"/>
+            </form>
+            <br/>
+            {% if house.long_leasing %}
+            {% if apps %}
+                {% for app in apps %}
+                    <tr>
+                    <td>起始时间：{{ app.s_y }}.{{ app.s_m }}.{{ app.s_d }}</td>
+                    <td>持续时间：{{ app.duration }}</td>
+                    </tr>
+                    <br/>
+                {% endfor %}
+            {% endif %}
+            {% endif %}
+    {% endif %}
+     <a href="../main">返回</a>
+    {% if message %}
+        <script type="text/javascript">
+            alert("{{ message }}");
+        </script>
+    {% endif %}
+</body>
+</html>

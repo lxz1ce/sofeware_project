@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>报修</title>
+</head>
+<body>
+    <form action="/repairing/" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        报修房间ID<input name="house_id" value="{{ house_id }}" readonly/>
+        <br/>
+        报修原因<input type="text" name="content"/>
+        <br/>
+        请上传照片描述(仅支持jpg文件)<input type="file" name="picture" multiple="">
+        <br/>
+        <button type="submit">提交</button>
+        <br/>
+        <a href="../my_app">返回</a>
+    </form>
+    {% if message %}
+        <script type="text/javascript">
+            alert("{{ message }}");
+        </script>
+    {% endif %}
+</body>
+</html>

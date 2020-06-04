@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>添加工单师傅</title>
+</head>
+<body>
+    <form action="/add_technician/" method="post">
+        {% csrf_token %}
+        请输入用户名<input type="text" name="username"/>
+        <br/>
+        请输入密码<input type="password" name="password1"/>
+        <br/>
+        请确认密码<input type="password" name="password2"/>
+        <br/>
+        请确认联系电话<input type="text" name="contact_number"/>
+        <br/>
+        <button type="submit">提交</button>
+        <br/>
+    <a href="../main">返回主页</a>
+    <br/>
+        {% if message %}
+            <script type="text/javascript">
+                alert("{{ message }}");
+            </script>
+        {% endif %}
+</body>
+</html>

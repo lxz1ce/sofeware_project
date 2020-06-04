@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="zn">
+<head>
+    <meta charset="UTF-8">
+    <title>我的消息</title>
+</head>
+<body>
+     {% if my_message %}
+            <tr>
+                <td>{{ my_message.title }}</td>
+                <td>{{ my_message.sender }}</td>
+                <td>{{ my_message.context }}</td>
+            </tr>
+    {% endif %}
+     <a href="../my_message">返回</a>
+    {% if message %}
+        <script type="text/javascript">
+            alert("{{ message }}");
+        </script>
+    {% endif %}
+</body>
+</html>

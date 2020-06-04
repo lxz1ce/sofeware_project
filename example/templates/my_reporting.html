@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>我的投诉</title>
+</head>
+<body>
+    {% if reports %}
+        {% for report in reports %}
+            <tr>
+                <td>投诉ID:{{ report.report_id }} </td>
+                <td>发起用户:{{ report.username }} </td>
+                <td>订单ID:{{ report.apply_id }} </td>
+                <td>处理状态:{{ report.status }} </td>
+                <td>投诉标题：{{ report.title }}</td>
+                <td>投诉内容：{{ report.content }}</td>
+                <td>
+                    {% if report.status == 1 %}
+                        处理结果:{{ report.handled_content }}
+                    {% endif %}
+                </td>
+            </tr>
+            <br/>
+        {% endfor %}
+    {% endif %}
+    <a href="../main">返回</a>
+</body>
+</html>

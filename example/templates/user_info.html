@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>客户具体信息</title>
+</head>
+<body>
+    <tr>
+        <td>{{ user.username }}</td>
+        <td>{{ user.email }}</td>
+    </tr>
+    <br/>
+    <form action="/user_info/" method="post">
+                {% csrf_token %}
+                <input name="user_name" type="hidden" value="{{app.username}}"/>
+
+                我已确认<input type="radio" name="commit" value="1">
+                <input type="submit" value="通过申请"/>
+    </form>
+    <br/>
+    <a href="../main">返回</a>
+    {% if message %}
+        <script type="text/javascript">
+            alert("{{ message }}");
+        </script>
+    {% endif %}
+</body>
+</html>
