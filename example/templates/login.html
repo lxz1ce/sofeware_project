@@ -1,0 +1,107 @@
+
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="register" content="width=device-width,initial-scale=1">
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+    <title>登录</title>
+    <style>
+        .bk{
+            background-color:white;
+            background-image:url("../static/images/background.jpg");
+            background-size: 100% 100%;
+            background-attachment: fixed;
+        }
+        .white{
+            color:white;
+        }
+    </style>
+
+</head>
+<body class="bk logobg_style" >
+    
+    <div id="large-header" style="margin-top:200px;">
+        <canvas id="demo-canvas" width="2000" height="711" style="z-index: -1; position: absolute; margin-top: -200px;"></canvas>
+        <div class="container"  style="width:450px;height: 400px;background-color: rgba(140,140,140,0.5);border-radius: 10px; ">
+        <form action="/login/" method="post" role="form">
+        {% csrf_token %}
+        <h1 class="white" style="text-align: center;">用户登录</h1>
+        <div class="row">
+                <div class="col-md-6 col-md-offset-3 form-group">
+                    <label style="text-align: center;"><span class="white" >请输入用户名</span></label><br/>
+                    <input type="text" name="username" class ="form-control" required="required" placeholder="输入您的用户名"/>
+                <br/>
+                </div>
+        </div>
+        <div class="row">
+                <div class="col-md-6 col-md-offset-3 text-align:center form-group">
+                    <label style="text-align: center;"><span class="white" >请输入密码</span></label><br/>
+                    <input id="password" type="password" name="password" class ="form-control" required="required" placeholder="输入您的密码"/>
+                    <br/>
+                </div>
+            </div>
+        <div class="row">
+                <div class="col-md-3 col-md-offset-3 form-group">
+                    <label style="text-align: center;"><span class="white" >我是客服</span><br/></label>
+                    <input type="checkbox" id="is_CS" name="is_CS" onclick="change1()"/>
+                </div>
+                <div class="col-md-4 form-group">
+                    <label style="text-align: center;"><span class="white" >我是工单师傅</span><br/></label>
+                    <input type="checkbox" id="is_tech" name="is_tech" onclick="change2()"/>
+                    <br>
+                </div>
+        </div>
+        
+        <div class="row" style="text-align: center; padding-left:140px;padding-right: 140px;">
+                <div class="form-group">
+                    <button id="submitButton" type="submit" class="btn btn-default btn-block">登陆</button>
+                </div>
+        </div>
+        </form>
+        <div class="row">
+        <span class="col-md-2 col-md-offset-4 ">
+            <a href="../" style="font-size: 1.2em;">首页</a>
+        </span>
+        <span class="col-md-2">
+            <a href="../register" style="font-size: 1.2em;">注册</a>
+        </span>
+        </div>
+    {% if message %}
+        <script type="text/javascript">
+            alert("{{ message }}");
+        </script>
+    {% endif %}
+    </div>
+    
+    </div>
+    <script src="../static/js/TweenLite/TweenLite.min.js"></script>
+    <script src="../static/js/TweenLite/EasePack.min.js"></script>
+    <script src="../static/js/TweenLite/rAF.js"></script>
+    <script src="../static/js/TweenLite/demo-1.js"></script>
+</body>
+
+<script>
+    function change1(){
+        var key1 = document.getElementById("is_CS").checked;
+        if(key1==true)
+        {
+            var key2 = document.getElementById("is_tech");
+            if(key2.checked==true)
+                key2.checked=false
+        }
+    }
+</script>
+
+<script>
+    function change2(){
+        var key1 = document.getElementById("is_tech").checked;
+        if(key1==true)
+        {
+            var key2 = document.getElementById("is_CS");
+            if(key2.checked==true)
+                key2.checked=false
+        }
+    }
+</script>
+</html>
