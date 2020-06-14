@@ -1,14 +1,13 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css"> 
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
     <script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
 	<script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
-    <title>Document</title>
+    <title>投诉</title>
     <style>
-
         .navbar {
             margin-bottom: 0;
             position: fixed;
@@ -34,11 +33,7 @@
             bottom: 0;
             overflow: scroll;
         }
-        .bk{
-            background-image: url("../static/images/bkg.jpg");
-            background-size: 100% 100%;
-            background-attachment: fixed;
-        }
+
         .active{
             background-color: #cccc99;
         }
@@ -46,10 +41,16 @@
         .myli{
             background-color: #CCFFFF;
         }
+
+        .bk{
+            background-image: url("../static/images/bkg.jpg");
+            background-size: 100% 100%;
+            background-attachment: fixed;
+        }
     </style>
 </head>
 <body class="bk">
-    <div class="navbar  navbar-fixed-top" style="position: fixed;background:#66cccc ">
+     <div class="navbar  navbar-fixed-top" style="position: fixed;background:#66cccc ">
         <span style="display:inline-block">
         <a href="#" class="navbar-brand text-align='center'"><span font face="黑体" style="color:white ;">青年租房管理系统</span></a>
         </span>
@@ -119,81 +120,32 @@
                 <HR style="FILTER: alpha(opacity=100,finishopacity=0,style=3)" width="80%" color=#987cb9 SIZE=3>
             </div>
             <div class="col-md-10 content pull-right" style="margin-top: 50px;">
-                <form action="/create_apply/" method="post" role="form">
+                <form action="/reporting/" method="post" enctype="multipart/form-data">
                     {% csrf_token %}
                     <div class="row">
                         <div class="col-md-6 col-md-offset-2 form-group">
-                            <label>租客用户名</label><br>
-                            <input name="username" type="text" class ="form-control" required/>
+                            <label>投诉标题：</label><br>
+                            <input type="text" name="title" class ="form-control" />
                             <br/>
                         </div>
-                    </div>
-                    <div class="row">
                         <div class="col-md-6 col-md-offset-2 form-group">
-                            <label>
-                                房源ID
-                            </label><br>
-                            <input name="house_id" type="number" class ="form-control" required>
+                            <label>投诉内容：</label><br>
+<!--                            <input type="text" name="content" class ="form-control" placeholder="请填写保修原因"/>-->
+                            <textarea cols="90" rows="10" name="content" class ="form-control" placeholder="请填写投诉原因"></textarea>
                             <br/>
                         </div>
-                    </div>
-                    <div class="row">
                         <div class="col-md-6 col-md-offset-2 form-group">
-                            <label>
-                                短租
-                            </label><br>
-                            <input name="rent_type" type="radio" value="short" required/>
-                            <br/>
-                            <label>
-                                长租
-                            </label><br>
-                            <input name="rent_type" type="radio" value="long" required/>
+                            <label>请上传照片描述(仅支持jpg文件)</label><br>
+                            <input type="file" name="picture" multiple=""/>
                             <br/>
                         </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6 col-md-offset-2 form-group">
-                            <label>
-                                起始时间
-                            </label><br>
+                        <div class="row">
+                            <div class="col-md-6 col-md-offset-2 form-group">
+                                <button type="submit"  class="btn btn-default">提交</button>
+                                <br/>
+                            </div>
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="col-md-2 col-md-offset-2 form-group">
-                            <input id="s_y" name="s_y" type="number" class ="form-control" min="2000" max="3000" required/>年
-                            <br/>
-                        </div>
-                        <div class="col-md-2 form-group">
-                            <input id="s_m" name="s_m" type="number" class ="form-control" min="1" max="12" required/>月
-                            <br/>
-                        </div>
-                        <div class="col-md-2 form-group">
-                            <input id="s_d" name="s_d" type="number" class ="form-control" min="1" max="31" onkeyup="checknumber()" required>日
-                            <br/>
-                            <span id="alert"></span>
-                        </div>
-                    </div>
-                    
-                    <div class="row">
-                        <div class="col-md-6 col-md-offset-2 form-group">
-                            <label>
-                                租房时长
-                            </label><br>
-                            <input name="duration" type="number" class ="form-control" required/>天/月
-                            <br>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6 col-md-offset-2 form-group">
-                            <button type="submit" name="sub" class="btn btn-default">提交</button>
-                            <br/>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6 col-md-offset-2 form-group">
-                        </div>
-                    </div>
-                    
                 </form>
             </div>
         </div>
@@ -204,63 +156,4 @@
         </script>
     {% endif %}
 </body>
-<script>
-    function checknumber()
-    {
-        var year = document.getElementsById("s_y").value;
-        var month = document.getElementsById("s_x").value;
-        var day = document.getElementsById("s_d").value;
-        var alt = document.getElementById("alert");
-        var mybutton = document.getElementsById("sub");
-        if((year%4==0&&year%100!=0)||year%400==0)
-        {
-            if(month==2)
-            {
-                if(day>29||day<1)
-                {
-                    alt.innerHTML="日期格式错误";
-                }
-            }
-            else if(month==1||month==3||month==5||month==7||month==8||month==10||month==12)
-            {
-                if(day>31||day<1)
-                {
-                    alt.innerHTML="日期格式错误";
-                }
-            }
-            else
-            {
-                if(day>30||day<1)
-                {
-                    alt.innerHTML="日期格式错误";
-                }
-            }
-        }
-        else
-        {
-            if(month==2)
-            {
-                if(day>28||day<1)
-                {
-                    alt.innerHTML="日期格式错误";
-                }
-            }
-            else if(month==1||month==3||month==5||month==7||month==8||month==10||month==12)
-            {
-                if(day>31||day<1)
-                {
-                    alt.innerHTML="日期格式错误";
-                }
-            }
-            else
-            {
-                if(day>30||day<1)
-                {
-                    alt.innerHTML="日期格式错误";
-                }
-            }
-        }
-    }
-</script>
 </html>
-

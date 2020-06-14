@@ -52,6 +52,11 @@ urlpatterns = [
     path('check_user/', views.check_user),
     path('CS_change_info/', views.CS_change_info),
     path('remind/', views.remind),
+    path('change_title/', views.change_title),
+    path('reporting/', views.reporting),
+    path('manage_reporting/', views.manage_reporting),
+    path('handle_reporting/', views.handle_reporting),
+    path('my_reporting/', views.my_reporting),
     url(r'^active/(?P<active_code>.*)/$', views.active, name="user_active"),
     url(r'^download_app/', views.download_app, name='crm_download'),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

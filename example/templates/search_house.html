@@ -1,75 +1,332 @@
 <!DOCTYPE html>
 <html lang="zn">
+
 <head>
     <meta charset="UTF-8">
+    <meta name="login" content="width=device-width,initial-scale=1">
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+	<script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <title>搜索房源</title>
+    <style>
+        .bk{
+            background-color: white;
+            background-image: url("../static/images/bkg.jpg");
+            background-size: 100% 100%;
+            background-attachment: fixed;
+        }
+        .font-black {
+            color: #101d37;
+        }
+
+        .navbar {
+            margin-bottom: 0;
+            position: fixed;
+            left: 0;
+            right: 0;
+        }
+
+        .container {
+            padding: 0;
+        }
+
+        .blank {
+            background-color: #fff;
+            height: 40px;
+            width: 100%;
+        }
+
+        .fir-form {
+            position: relative;
+            box-sizing: border-box;
+            background-color: rgba(245,245,246,0);
+            padding-top: 90px;
+        }
+
+        .search-input {
+            position: absolute;
+            top: 25px;
+            left: 40px;
+            width: 80%;
+            vertical-align: top;
+            box-sizing: border-box;
+            height: 45px;
+            line-height: 45px;
+            padding: 0 22px;
+            /* border: 0;
+            box-shadow: 0 1px 2px -1px rgba(0, 0, 0, .2);
+            border-radius: 2px; */
+        }
+
+        .sec-form {
+            background-color: rgba(245,245,246,0);
+            margin: 0 40px 20px 40px;
+            padding: 20px 30px;
+        }
+
+        span {
+            padding-right: 10px;
+        }
+
+        label {
+            margin-bottom: 0;
+        }
+
+        .select {
+            vertical-align: top;
+            box-sizing: border-box;
+            height: 24px;
+            line-height: 24px;
+            font-size: 14px;
+            padding: 0 22px;
+            /* border: 0;
+            box-shadow: 0 1px 2px -1px rgba(0, 0, 0, .2); */
+            border-radius: 2px;
+        }
+
+        .flex-align {
+            display: flex;
+            align-items: center;
+        }
+
+        input[type=checkbox] {
+            margin-right: 10px;
+            margin-top: 0;
+            height: 20px;
+            width: 20px;
+        }
+
+        input[type=number] {
+            vertical-align: top;
+            box-sizing: border-box;
+            height: 24px;
+            line-height: 24px;
+            font-size: 14px;
+            padding-left: 6px;
+            /* border: 0;
+            box-shadow: 0 1px 2px -1px rgba(0, 0, 0, .2);
+            border-radius: 2px; */
+            width: 100px;
+        }
+
+        .price-text {
+            padding: 0 6px;
+        }
+
+        .card-img-top {
+            border-radius: 4px;
+            width: 100%;
+        }
+
+        .card {
+            width: 100%;
+        }
+
+        .myli{
+            background-color: #CCFFFF;
+        }
+        
+        .myborder{
+            border-style: solid; 
+            border-width: 1px 1px 1px 1px; 
+            border-color:rgba(170,170,170,0.5) ;
+        }
+
+        .divborder{
+            border-style: solid; 
+            border-width: 1px 0px 0px 0px; 
+            border-color:rgba(170,170,170,0.5) ;
+        }
+    </style>
 </head>
-<body>
-    <form action="/search_house/" method="post">
-        {% csrf_token %}
-        搜索：<input type="text" name="key_word"/>
-        区域:<select name="district">
-        <option value="不限">不限</option>
-        <option value="东城区">东城区</option>
-        <option value="西城区">西城区</option>
-        <option value="朝阳区">朝阳区</option>
-        <option value="丰台区">丰台区</option>
-        <option value="石景山区">石景山区</option>
-        <option value="海淀区">海淀区</option>
-        <option value="顺义区">顺义区</option>
-        <option value="通州区">通州区</option>
-        <option value="大兴区">大兴区</option>
-        <option value="房山区">房山区</option>
-        <option value="门头沟区">门头沟区</option>
-        <option value="昌平区">昌平区</option>
-        <option value="平谷区">平谷区</option>
-        <option value="密云区">密云区</option>
-        <option value="怀柔区">怀柔区</option>
-        <option value="延庆区">延庆区</option>
-        </select>
-        <input type="submit"/>
-        短租：<input type="radio" name="short_leasing"/>
-        长租：<input type="radio" name="long_leasing"/>
-        短租价格区间：<input type="number" name="short_min_fee" value=0 />-<input type="number" name="short_max_fee" value=99999 />
-        长租价格区间：<input type="number" name="long_min_fee" value=0 />-<input type="number" name="long_max_fee" value=99999 />
-    </form>
-    <a href="../main">返回</a>
-    <br/>
-    {% if houses %}
-        {% for house in houses %}
-            <tr>
-                <td>{{ house.house_name }}</td>
-                <td>{{ house.short_leasing }}</td>
-                <td>{{ house.short_leasing_fee }}</td>
-                <td>{{ house.long_leasing }}</td>
-                <td>{{ house.long_leasing_fee }}</td>
-                <td>{{ house.house_type }}</td>
-                <td>{{ house.district }}</td>
-                <td>{{ house.address }}</td>
-                <td>{{ house.contact_number }}</td>
-                <td>房屋状态：{{ house.status }}</td>
-            </tr>
-            {% if kind != 'guest' %}
-            <form action="/specific_info/" method="post">
-                {% csrf_token %}
-                <input name="selected_id" type="hidden" value="{{house.house_id}}">
-                <input type="submit" value="查看该房源"/>
-            </form>
+
+<body class="bk" style="background-color: rgba(245,245,246,0);">
+    <div class="container" style="width:100%;background-color:rgba(245,245,246,0);margin-top:51px; ">
+        <div class="navbar  navbar-fixed-top" style="position: fixed;background:#66cccc ">
+            <span style="display:inline-block">
+            <a href="#" class="navbar-brand text-align='center'"><span font face="黑体" style="color:white ;">青年租房管理系统</span></a>
+            </span>
+            {% if kind == "guest" %}
+                <span style="float:right; margin-top:8px">
+                    <a href="../register"><button class="btn btn-default">注册</button></a>
+                </span>
+                <span style="float:right; margin-top:8px">
+                    <a href="../login"><button class="btn btn-default">登录</button></a>
+                </span>
+            {% else %}
+                <span style="float:right; margin-top:8px">
+                    <a href="../logout"><button class="btn btn-default">退出</button></a>
+                </span>
+                <span style="float:right; margin-top:8px">
+                    <a href="../show_info"><button class="btn btn-default">个人中心</button></a>
+                </span>
+                <span style="float:right; margin-top:0px">
+                    <a href="#" class="navbar-brand text-align='center'">
+                        <span font face="黑体" style="color:white ;">
+                        {% if kind == "CS" %}
+                            客服
+                        {% endif %}
+                        {% if kind == "user" %}
+                            用户
+                        {% endif %}
+                        {% if kind == "tech" %}
+                            维修人员
+                        {% endif %}
+                        ：{{ username }}
+                        </span>
+                    </a>
+                </span>
             {% endif %}
-            {% if kind == 'CS' %}
-                <form action="/delete_house/" method="post">
-                {% csrf_token %}
-                <input name="house_id" type="hidden" value="{{house.house_id}}">
-                <input type="submit" value="下架该房源"/>
+        </div>
+        <div class="row " style="background-color: rgba(245,245,246,0);">
+            <div class="col-md-6 " style="margin-top: 0px; margin-left: 55px; background-color: rgba(245,245,246,0); border-radius: 7px;">
+
+                <form class="form" action="/search_house/" method="post" role="form" >
+                    {% csrf_token %}
+                    <!-- <br> -->
+                    &nbsp;
+                    <br/>
+                    <br>
+                    <div class="fir-form ">
+                        <input class="search-input form-control" style="margin-left: 25px;" type="text" name="key_word" placeholder="输入关键词进行搜索" />
+                    </div>
+                    <div class="sec-form" style=" #f5f5f6">
+                        <div class="row">
+                            <div class="col-md-offset-0 col-md-10 form-group flex-align form-group">
+                                <label><span class="font-black">所要租房区域</span></label>
+                                <select class="select" style="width:60%; border-radius: 3px; border-color: rgba(170,170,170,0.5);" name="district" >
+                                    <option value="不限">不限</option>
+                                    <option value="东城区">东城区</option>
+                                    <option value="西城区">西城区</option>
+                                    <option value="朝阳区">朝阳区</option>
+                                    <option value="丰台区">丰台区</option>
+                                    <option value="石景山区">石景山区</option>
+                                    <option value="海淀区">海淀区</option>
+                                    <option value="顺义区">顺义区</option>
+                                    <option value="通州区">通州区</option>
+                                    <option value="大兴区">大兴区</option>
+                                    <option value="房山区">房山区</option>
+                                    <option value="门头沟区">门头沟区</option>
+                                    <option value="昌平区">昌平区</option>
+                                    <option value="平谷区">平谷区</option>
+                                    <option value="密云区">密云区</option>
+                                    <option value="怀柔区">怀柔区</option>
+                                    <option value="延庆区">延庆区</option>
+                                </select>
+                                <br />
+                            </div>
+                        </div>
+                        <br>
+                        <div class="row"  >
+                            <div class="col-md-offset-0 col-md-12 form-group flex-align" style=" #f5f5f6">
+                                <label><span class="font-black" >短租：</span></label>
+                                <input type="checkbox" name="short_leasing"  />
+                                <label><span class="font-black">短租价格区间：</span></label>
+                                <input type="number" name="short_min_fee" value=0 class="form-control" style="width: 30%;"/>
+                                <label class="price-text">-</label>
+                                <input type="number" name="short_max_fee" value=99999 class="form-control" style="width: 30%;"/>
+                                <br>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-offset-0 col-md-12 form-group flex-align">
+                                <label><span class="font-black">长租：</span></label>
+                                <input type="checkbox" name="long_leasing" />
+                                <label><span class="font-black">长租价格区间：</span></label>
+                                <input type="number" name="long_min_fee" value=0 min="0" max="99999" class="form-control" style="width: 30%;"/>
+                                <label class="price-text">-</label>
+                                <input type="number" name="long_max_fee" value=99999 min="0" max="99999" class="form-control" style="width: 30%;"/>
+                                <br>
+                            </div>
+                        </div>
+                        <br>
+                        <div class="row" style="padding-left:10px">
+                            <div class="orm-group col-md-offset-0">
+                                <button id="submitButton" type="submit" class="btn btn-primary"
+                                    style="margin-right: 10px;width: 80px;">搜索</button>
+                                <a href="../search_house" style="color: #fff;">
+                                <button class="btn btn-warning" style="width: 80px;">
+                                    刷新
+                                </button>
+                                    </a>
+                                <br>
+                            </div>
+                        </div>
+                    </div>
                 </form>
-            {% endif %}
-            <br/>
+            </div>
+            <div  class=" col-md-offset-1 col-md-4 myborder" style="margin-top: 30px; margin-right: 10px; margin-left: 100px; margin-bottom: 50px;background-color: rgba(245,245,246,0.3); border-radius: 7px;">
+                <h1> &nbsp &nbsp &nbsp &nbsp&nbsp &nbsp &nbsp&nbsp &nbsp站内公告</h1>
+                <HR style="FILTER: alpha(opacity=100,finishopacity=0,style=3)" width="100%" SIZE=10>
+                <div style="width: 470px; height: 220px; " class="">
+                    <h4 style="text-align: center;">{{title}}</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+    <section id="gallery" class="container" style="padding-bottom: 40px;width: 100%;padding: 0 40px;  ">
+        {% if houses %}
+        {% for house in houses %}
+        {% if house.status == 2 %}
+        <div class="col-md-3 col-sm-3" style="padding-left: 0;box-sizing: border-box; margin-top: 5px;" >
+            <div class="card border-10 mb-6 mt-6">
+                <img class="card-img-top" src="../static/media{{house.picture}}1.jpg" style="height:320px" alt="Card image cap">
+                <div class="card-body border d-flex justify-content-start">
+                    <div class="align-self-center">
+                        <br>
+                        <p class="mb-0"><b>{{ house.district }}·{{ house.address }}</b></p>
+                        <div style="margin-top: -10px;"><b>
+                                {% if house.house_type == 0 %}
+                                单人间
+                                {% elif house.house_type == 1 %}
+                                双人间
+                                {% elif house.house_type == 2 %}
+                                四人间
+                                {% endif %}
+                            </b>
+                            {% if house.short_leasing == True %}
+                            <div style="float:right;">
+                                <font color="red" style="text-align: right;">
+                                    <b>{{house.short_leasing_fee}}元/天</b>
+                                </font>
+                            </div>
+                            {% endif %}
+                            {% if house.long_leasing == True %}
+                            <div style="float:right;">
+                                <font color="red" style="text-align: right;"><b>{{house.long_leasing_fee}}元/月</b>
+                                </font>
+                            </div>
+                            {% endif %}
+                        </div>
+                        <br>
+                    </div>
+                    <div class=" align-self-center  ml-auto" style="display:flex">
+                        <form action="/specific_info/" method="post">
+                            {% csrf_token %}
+                            <input name="selected_id" type="hidden" value="{{house.house_id}}">
+                            <button id="submitButton2" type="submit" class="btn btn-primary">查看该房源</button>
+                        </form>
+                        {% if kind == 'CS' %}
+                        <form action="/delete_house/" method="post" style="margin-left: 20px;">
+                            {% csrf_token %}
+                            <input name="house_id" type="hidden" value="{{house.house_id}}">
+                            <button id="submitButton3" type="submit" class="btn btn-warning">下架该房源</button>
+                        </form>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <br>
+        </div>
+        {% endif %}
         {% endfor %}
-    {% endif %}
-    {% if message %}
+        {% endif %}
+        {% if message %}
         <script type="text/javascript">
             alert("{{ message }}");
         </script>
-    {% endif %}
+        {% endif %}
+    </section>
 </body>
+
 </html>

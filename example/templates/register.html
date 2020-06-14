@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="register" content="width=device-width,initial-scale=1">
-    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">  
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+	<script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>  
     <title>注册</title>
     <style>
         .bk{
@@ -14,12 +16,17 @@
         .white{
             color:gray;
         }
+
+        .myli{
+            background-color: #CCFFFF;
+        }
     </style>
 </head>
-<body class="bk logobg_style">
-    <div id="large-header" style="margin-top:70px">
+<body class="bk logobg_style" >
+    
+    <div id="large-header" style="margin-top:70px;">
+        <canvas id="demo-canvas" width="2000" height="711" style="z-index: -1; position: absolute; margin-top: -70px;"></canvas>
         <div  class="container">
-            <canvas id="demo-canvas" width="2000" height="800" style="z-index: -1; position: absolute; margin-top: -70px;"></canvas>
             <form action="/register/" method="post" role="form">
                 {% csrf_token %}
                 <h1 class="white" style="text-align: center;">用户注册</h1>
@@ -59,7 +66,7 @@
                 <div class="row">
                     <div class="col-md-6 col-md-offset-3 text-align:center from-group">
                         <label class="white"><span>请输入身份证号</span></label><br/>
-                        <input type="text" id="ID_card" name="ID_card" class ="form-control" required="required" placeholder="输入您的身份证号" onkeyup="checkIDnum()"/>
+                        <input type="text" id="ID_card" name="ID_card" class ="form-control" required="required" placeholder="输入您的身份证号"/>
                         <!-- <span id="tishiIdNum" style="color:red; display: inline;" >身份证格式错误</span> -->
                         <br/>
                     </div>
@@ -113,22 +120,26 @@
                     </script>
                 {% endif %}
         </div>
+        <script>
+            var usr = document.getElementById('username').value;
+            var pwd1 = document.getElementById('password1').value;
+            var pwd2 = document.getElementById('password2').value;
+            var eml = document.getElementById('email').value;
+            if(usr==''||pwd1==''||pwd2==''||eml=='')
+            {
+                document.getElementById("submitButton").disabled = true;
+            }
+        </script>
+        <script src="../static/js/TweenLite/TweenLite.min.js"></script>
+        <script src="../static/js/TweenLite/EasePack.min.js"></script>
+        <script src="../static/js/TweenLite/rAF.js"></script>
+        <script src="../static/js/TweenLite/demo-1.js"></script>
+        {% if message %}
+        <script type="text/javascript">
+            alert("{{ message }}");
+        </script>
+        {% endif %}
     </div>
-    
-    <script>
-        var usr = document.getElementById('username').value;
-        var pwd1 = document.getElementById('password1').value;
-        var pwd2 = document.getElementById('password2').value;
-        var eml = document.getElementById('email').value;
-        if(usr==''||pwd1==''||pwd2==''||eml=='')
-        {
-            document.getElementById("submitButton").disabled = true;
-        }
-    </script>
-    <script src="../static/js/TweenLite/TweenLite.min.js"></script>
-    <script src="../static/js/TweenLite/EasePack.min.js"></script>
-    <script src="../static/js/TweenLite/rAF.js"></script>
-    <script src="../static/js/TweenLite/demo-1.js"></script>
 </body>
 <script>
     function validate() {
@@ -225,7 +236,7 @@
 </script>
 <script>
     	function checkIDnum(){
-        var ids=document.getElementById("ID_card");
+        var ids=document.getElementById("ID_card").value;
 		if(ids.length()!=18) {
 			document.getElementById("tishiIdNum").style.display="inline";
 		}

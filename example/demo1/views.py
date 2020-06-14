@@ -32,6 +32,14 @@ def home(request):
 
 
 def login(request):
+	if models.Message.objects.filter():
+		Message = models.Message.objects.get(message_id=1)
+	else:
+		Message = models.Message()
+		Message.content = "暂无相关公告"
+		Message.username = "1"
+		Message.house_id = 1
+		Message.save()
 	if request.session.get('id') != None:
 		return redirect('/')
 	if request.method == 'POST':
@@ -50,7 +58,8 @@ def login(request):
 					request.session['id'] = CS.id
 					request.session['kind'] = "CS"
 					message = '登陆成功，欢迎您，' + str(CS.username)
-					return render(request, 'main.html', {"message": message, "username": username, "kind": "CS"})			#客服登录成功
+					
+					return render(request, 'search_house.html', {"message": message, "username": username, "kind": "CS", "title": Message.content})			#客服登录成功
 				else:
 					message = '密码错误'
 					return render(request, 'login.html', {"message":message})
@@ -70,7 +79,14 @@ def login(request):
 					request.session['id'] = technician.id
 					request.session['kind'] = "tech"
 					message = '登陆成功，欢迎您，' + str(technician.username)
-					return render(request, 'main.html', {"message": message, "username": username, "kind": "tech"})			#工单师傅登录成功
+					user = models.Technician.objects.get(id=request.session.get('id'))
+					email = "工单师傅无邮箱记录"
+					username = user.username
+					password = user.password
+					kind = "tech"
+					
+					title = Message.content
+					return render(request, 'show_info.html', locals())			#工单师傅登录成功
 				else:
 					message = '密码错误'
 					return render(request, 'login.html', {"message":message})
@@ -93,7 +109,8 @@ def login(request):
 					request.session['id'] = user.id
 					request.session['kind'] = "user"
 					message = '登陆成功，欢迎您，' + str(user.username)
-					return render(request, 'main.html', {"message": message, "username": username, "kind": "user"})			#用户登录成功
+					
+					return render(request, 'search_house.html', {"message": message, "username": username, "kind": "user", "title": Message.content})			#用户登录成功
 				else:
 					message = '密码错误'
 					return render(request, 'login.html', {"message":message})
@@ -131,13 +148,13 @@ def register(request):
 				CS.password = password1
 				CS.save()
 				message = '客服注册成功'
-				return render(request, 'home.html', {"message": message})
+				return render(request, 'login.html', {"message": message})
 		legal, message = checkout(username, password1, password2, email)
 		if not legal:
 			return render(request, 'register.html', {"message": message})
 		add_user(username, password1, email, real_name, ID_card)
 		message = '注册成功，请查看邮箱验证'
-		return render(request, 'home.html', {"message": message})
+		return render(request, 'login.html', {"message": message})
 	return render(request, 'register.html')
 
 
@@ -174,7 +191,7 @@ def active(request, active_code):
 		user.status = 1
 		user.save()
 		message = '验证成功'
-		return render(request, 'home.html', {"message": message})
+		return render(request, 'login.html', {"message": message})
 	else:
 		message = '邮箱验证失败，请重新注册'
 		return render(request, 'register.html', {"message": message})
@@ -201,16 +218,20 @@ def main(request):
 
 
 def show_info(request):
+	title = models.Message.objects.get(message_id=1).content
 	kind = request.session.get('kind')
 	if request.session.get('id'):
 		if request.session.get('kind') == 'user':
-			user = models.User.objects.get(id = request.session.get('id'))
+			user = models.User.objects.get(id=request.session.get('id'))
 			email = user.email
 			real_name = user.real_name
 			ID_card = user.ID_card
-		else:
-			user = models.Customerserver.objects.get(id = request.session.get('id'))
+		elif request.session.get('kind') == 'CS':
+			user = models.Customerserver.objects.get(id=request.session.get('id'))
 			email = "客服无邮箱记录"
+		else:
+			user = models.Technician.objects.get(id=request.session.get('id'))
+			email = "工单师傅无邮箱记录"
 		username = user.username
 		password = user.password
 	if request.method == 'POST':
@@ -233,12 +254,17 @@ def show_info(request):
 			password = user.password
 			message = '修改成功'
 			kind = request.session['kind']
-			return render(request, 'main.html', locals())
-		else:
+			return render(request, 'search_house.html', locals())
+		elif request.session.get('kind') == 'CS':
 			message = '客服信息一旦创建不可修改'
 			username = models.Customerserver.objects.get(id = request.session.get('id')).username
 			kind = 'CS'
-			return render(request, 'main.html', locals())
+			return render(request, 'search_house.html', locals())
+		else:
+			message = '工单师傅信息一旦创建不可修改'
+			username = models.Technician.objects.get(id=request.session.get('id')).username
+			kind = 'tech'
+			return render(request, 'search_house.html', locals())
 	else:
 		return render(request, 'show_info.html', locals())
 
@@ -259,6 +285,8 @@ def add_user(username, password, email, real_name, ID_card, new_user=True):
 
 
 def add_house(request):
+	title = models.Message.objects.get(message_id=1).content
+	username = models.Customerserver.objects.get(id=request.session.get('id')).username
 	if request.method == 'POST':
 		house_name = request.POST.get('house_name')
 		short_leasing = request.POST.get('short_leasing')
@@ -275,18 +303,20 @@ def add_house(request):
 		if files:
 			for file in files:
 				if not str(file.name).__contains__("jpg"):
-					return render(request, 'add_house.html', {"message": "图片仅支持jpg格式"})
+					return render(request, 'add_house.html', {"message": "图片仅支持jpg格式", "kind": "CS", "username": username})
 		else:
-			return render(request, 'add_house.html', {"message": "请上传图片"})
+			return render(request, 'add_house.html', {"message": "请上传图片", "kind": "CS", "username": username})
 
 		house = models.House()
 		if house_name and house_type and district and address and contact_number and file:
 			house.house_name = house_name
 			house.short_leasing = short_leasing
 			if short_leasing:
+				print(short_leasing)
 				house.short_leasing_fee = short_leasing_fee
 			house.long_leasing = long_leasing
 			if long_leasing:
+				print(long_leasing)
 				house.long_leasing_fee = long_leasing_fee
 			house.house_type = house_type
 			house.district = district
@@ -305,14 +335,22 @@ def add_house(request):
 			house.pic_num = i - 1
 			house.save()
 			message = "添加成功"
-			return render(request, 'main.html', {"message": message, "kind": request.session.get('kind')})
+			return render(request, 'search_house.html', {"message": message, "kind": request.session.get('kind'), "username": username, "title": title})
 		else:
 			message = "请将信息填写完整"
-			return render(request, 'add_house.html', {"message": message})
-	return render(request, 'add_house.html')
+			return render(request, 'add_house.html', {"message": message, "kind": "CS", "username": username})
+	return render(request, 'add_house.html', {"kind": "CS", "username": username})
 
 
 def search_house(request):
+	if models.Message.objects.filter():
+		Message = models.Message.objects.get(message_id=1)
+	else:
+		Message = models.Message()
+		Message.content = "暂无相关公告"
+		Message.house_id = 1
+		Message.username = "1"
+		Message.save()
 	houses = models.House.objects.all()
 	houses = houses.exclude(long_leasing=True, status=1)
 	login_name = ""
@@ -321,12 +359,17 @@ def search_house(request):
 		if request.session.get('id'):
 			user = models.User.objects.get(id=request.session.get('id'))
 			login_name = user.username
-			kind = 'User'
+			kind = 'user'
 	elif request.session.get('kind') == 'CS':
 		if request.session.get('id'):
 			cs = models.Customerserver.objects.get(id=request.session.get('id'))
 			login_name = cs.username
 			kind = 'CS'
+	elif request.session.get('kind') == 'tech':
+		if request.session.get('id'):
+			tech = models.Technician.objects.get(id=request.session.get('id'))
+			login_name = tech.username
+			kind = 'tech'
 	else:
 		kind = 'guest'
 		login_name = 'guest'
@@ -346,11 +389,28 @@ def search_house(request):
 		houses = houses.filter(short_leasing_fee__lte=request.POST.get('short_max_fee'))
 		houses = houses.filter(long_leasing_fee__gte=request.POST.get('long_min_fee'))
 		houses = houses.filter(long_leasing_fee__lte=request.POST.get('long_max_fee'))
-	return render(request, 'search_house.html', {'houses': houses, "username": login_name, 'kind': kind})
+	return render(request, 'search_house.html', {'houses': houses, "username": login_name, 'kind': kind, "title": Message.content})
 
 
 def specific_info(request):
 	message = ""
+	login_name = ""
+	kind = ""
+	if request.session.get("kind") == "user":
+		user = models.User.objects.get(id=request.session.get('id'))
+		kind = "user"
+		login_name = user.username
+	elif request.session.get("kind") == "tech":
+		user = models.Technician.objects.get(id=request.session.get('id'))
+		kind = "tech"
+		login_name = user.username
+	elif request.session.get("kind") == "CS":
+		user = models.Customerserver.objects.get(id=request.session.get('id'))
+		kind = "CS"
+		login_name = user.username
+	else:
+		kind = "guest"
+		login_name = "guest"
 	if request.method == 'POST':
 		house = models.House.objects.get(house_id=request.POST.get('selected_id'))
 		apps = models.Application.objects.all()
@@ -360,9 +420,8 @@ def specific_info(request):
 		elif request.POST.get('type') == 'long':
 			rent_type = 'long'
 		else:
-			return render(request, 'specific_info.html', {'house': house, 'apps': apps})
+			return render(request, 'specific_info.html', {'house': house, 'apps': apps, "kind": kind, "username": login_name})
 		application = models.Application()
-		user = models.User.objects.get(id=request.session.get('id'))
 		application.username = user.username
 		application.house_id = request.POST.get('selected_id')
 		application.rent_type = rent_type
@@ -375,11 +434,12 @@ def specific_info(request):
 			house.status = 0
 		house.save()
 		message = '提交订单成功'
-	return render(request, 'specific_info.html', {'house': house, 'apps': apps, 'message': message})
+	return render(request, 'specific_info.html', {'house': house, 'apps': apps, 'message': message, "kind": kind, "username": login_name})
 
 
 def add_technician(request):
 	message = ""
+	login_name = models.Customerserver.objects.get(id=request.session.get('id')).username
 	if request.method == 'POST':
 		username = request.POST.get('username').strip()
 		password1 = request.POST.get('password1').strip()
@@ -389,16 +449,16 @@ def add_technician(request):
 			technician = models.Technician()
 			if models.Technician.objects.filter(username=username).exists():
 				message = '该用户名已被注册'
-				return render(request, 'add_technician.html', {"message": message})
+				return render(request, 'add_technician.html', {"message": message, "kind": "CS", "username": login_name})
 			if password1 != password2:
 				message = '两次密码不一致'
-				return render(request, 'add_technician.html', {"message": message})
+				return render(request, 'add_technician.html', {"message": message, "kind": "CS", "username": login_name})
 			technician.username = username
 			technician.password = password1
 			technician.contact_number = contact_number
 			technician.save()
 			message = '工单师傅注册成功'
-	return render(request, 'add_technician.html', {"message": message})
+	return render(request, 'add_technician.html', {"message": message, "kind": "CS", "username": login_name})
 
 
 def check_app(request):
@@ -416,11 +476,15 @@ def check_app(request):
 			apps = apps.filter(username=request.POST.get('username'))
 		if request.POST.get('house_id'):
 			apps = apps.filter(house_id=request.POST.get('house_id'))
-	return render(request, 'check_app.html', {'apps': apps, "csname": login_name})
+	return render(request, 'check_app.html', {'apps': apps, "csname": login_name, "kind": "CS"})
 
 
 def confirm_payment(request):
 	message = ""
+	login_name = ""
+	if request.session.get('id'):
+		cs = models.Customerserver.objects.get(id=request.session.get('id'))
+		login_name = cs.username
 	if request.method == 'POST':
 		app = models.Application.objects.get(apply_id=request.POST.get('apply_id'))
 		app.is_paid = True
@@ -429,7 +493,7 @@ def confirm_payment(request):
 		app.save()
 		house.save()
 		message = "确认成功"
-		return render(request, 'confirm_payment.html', {'message': message})
+		return render(request, 'check_app.html', {'message': message, "kind": "CS", "csname": login_name})
 
 
 def user_info(request):
@@ -446,7 +510,7 @@ def user_info(request):
 			user = models.User.objects.get(username=request.POST.get('user_name'))
 
 		if request.POST.get('commit') != '1':
-			return render(request, 'user_info.html', {'user': user, 'message':message})
+			return render(request, 'user_info.html', {'user': user, 'message': message, "kind": "CS", "username": cs.username})
 		else:
 			apply_id = request.session.get('apply_id')
 			app = models.Application.objects.get(apply_id=apply_id)
@@ -494,27 +558,30 @@ def user_info(request):
 			p = document.add_paragraph('签约时间：       年     月     日')
 			p.alignment = WD_PARAGRAPH_ALIGNMENT.RIGHT
 			document.save('./static/applications/' + str(app.apply_id) + '.docx')
-	return render(request, 'user_info.html', {'message':message})
+	return render(request, 'user_info.html', {'message':message, "kind": "CS", "username": cs.username})
 
 
 def cancel_apply(request):
+	cs = models.Customerserver.objects.get(id=request.session.get('id'))
 	if request.method == 'POST':
 		if request.POST.get('apply_id'):
 			app = models.Application.objects.get(apply_id=request.POST.get('apply_id'))
 			app.delete()
-			return render(request, 'check_app.html', {'message': '拒绝成功'})
-	return render(request, 'cancel_apply.html', {'message': '删除错误'})
+			return render(request, 'check_app.html', {'message': '拒绝成功', "kind": "CS", "username": cs.username})
+	return render(request, 'cancel_apply.html', {'message': '删除错误', "kind": "CS", "username": cs.username})
 
 
 def delete_house(request):
+	title = models.Message.objects.get(message_id=1).content
 	message = ""
+	cs = models.Customerserver.objects.get(id=request.session.get('id'))
 	if request.method == 'POST':
 		house = models.House.objects.get(house_id=request.POST.get('house_id'))
 		if os.path.exists(settings.MEDIA_ROOT + "/demo1/" + str(house.house_id)):
 			shutil.rmtree(settings.MEDIA_ROOT + "/demo1/" + str(house.house_id))
 		house.delete()
 		message = '下架成功'
-	return render(request, 'search_house.html', {'message': message})
+	return render(request, 'search_house.html', {'message': message, "kind": "CS", "username": cs.username, "title": title})
 
 
 def my_app(request):
@@ -526,7 +593,7 @@ def my_app(request):
 	if request.method == 'POST':
 		if request.POST.get('house_id'):
 			my_apps = my_apps.filter(house_id=request.POST.get('house_id'))
-	return render(request, 'my_app.html', {'my_apps': my_apps, "username": login_name})
+	return render(request, 'my_app.html', {'my_apps': my_apps, "username": login_name, "kind": "user"})
 
 
 def pay(request):
@@ -538,6 +605,8 @@ def pay(request):
 
 
 def repairing(request):
+	title = models.Message.objects.get(message_id=1).content
+	username = models.User.objects.get(id=request.session.get('id'))
 	if request.method == 'POST':
 		house_id = request.POST.get('house_id')
 		if house_id:
@@ -546,11 +615,11 @@ def repairing(request):
 			if files:
 				for file in files:
 					if not str(file.name).__contains__("jpg"):
-						return render(request, 'repairing.html', {"message": "图片仅支持jpg格式", "house_id": house_id})
+						return render(request, 'repairing.html', {"message": "图片仅支持jpg格式", "house_id": house_id, "kind": "user", "username": username})
 			else:
-				return render(request, 'repairing.html', {"message": "请上传图片", "house_id": house_id})
+				return render(request, 'repairing.html', {"message": "请上传图片", "house_id": house_id, "kind": "user", "username": username})
 			if not content:
-				return render(request, 'repairing.html', {"message": "报修原因不能为空", "house_id": house_id})
+				return render(request, 'repairing.html', {"message": "报修原因不能为空", "house_id": house_id, "kind": "user", "username": username})
 			repairing = models.Repairing()
 			repairing.house_id = house_id
 			repairing.username = models.User.objects.get(id=request.session.get('id')).username
@@ -567,11 +636,11 @@ def repairing(request):
 				i += 1
 			repairing.pic_num = i - 1
 			repairing.save()
-			return render(request, 'my_app.html', {"message": "添加成功"})
+			return render(request, 'my_app.html', {"message": "添加成功", "kind": "user", "username": username})
 		else:
 			app = models.Application.objects.get(apply_id=request.POST.get('selected_id'))
-			return render(request, 'repairing.html', {"house_id": app.house_id})
-	return render(request, 'home.html', {"message": "错误"})
+			return render(request, 'repairing.html', {"house_id": app.house_id, "kind": "user", "username": username})
+	return render(request, 'search_house.html', {"message": "错误", "kind": "user", "username": username, "title": title})
 
 
 def manage_repairing(request):
@@ -589,10 +658,12 @@ def manage_repairing(request):
 			repairing = repairing.filter(username=request.POST.get('username'))
 		if request.POST.get('house_id'):
 			repairing = repairing.filter(house_id=request.POST.get('house_id'))
-	return render(request, 'manage_repairing.html', {"login_name": login_name, "repairing": repairing})
+	return render(request, 'manage_repairing.html', {"username": login_name, "repairing": repairing, "kind": "CS"})
 
 
 def cancel_repairing(request):
+	title = models.Message.objects.get(message_id=1).content
+	username = models.Customerserver.objects.get(id=request.session.get('id')).username
 	if request.method == 'POST':
 		if request.POST.get('repairing_id'):
 			repairing = models.Repairing.objects.filter(repair_id=request.POST.get('repairing_id')).first()
@@ -606,16 +677,17 @@ def cancel_repairing(request):
 			repairing.delete()
 			if os.path.exists(settings.MEDIA_ROOT + "/demo1/" + str(repairing.repair_id)):
 				shutil.rmtree(settings.MEDIA_ROOT + "/demo1/" + str(repairing.repair_id))
-			return render(request, 'main.html', {'message': '拒绝成功'})
-	return render(request, 'manage_repairing.html', {'message': '拒绝错误'})
+			return render(request, 'search_house.html', {'message': '拒绝成功', "kind": "CS", "username": username, "title": title})
+	return render(request, 'manage_repairing.html', {'message': '拒绝错误', "kind": "CS", "username": username, "title": title})
 
 
 def arrange_repairing(request):
+	username = models.Customerserver.objects.get(id=request.session.get('id')).username
 	if request.method == 'POST':
 		if not request.POST.get('technician'):
-			return render(request, 'manage_repairing.html', {'message': '请安排工单师傅'})
+			return render(request, 'manage_repairing.html', {'message': '请安排工单师傅', "kind": "CS"})
 		if not models.Technician.objects.filter(username=request.POST.get('technician')).exists():
-			return render(request, 'manage_repairing.html', {'message': '该工单师傅不存在'})
+			return render(request, 'manage_repairing.html', {'message': '该工单师傅不存在', "kind": "CS"})
 		repairing = models.Repairing.objects.filter(repair_id=request.POST.get('repairing_id')).first()
 		repairing.repair_technician = models.Technician.objects.filter(username=request.POST.get('technician')).first().username
 		repairing.is_allow = True
@@ -627,8 +699,8 @@ def arrange_repairing(request):
 		new_message.context = "您的报修已被管理员通过，请等待编号为" + str(repairing.repair_technician) + "的工单师傅进行处理。联系方式：" + str(models.Technician.objects.get(username=repairing.repair_technician).contact_number)
 		new_message.title = "报修结果通知"
 		new_message.save()
-		return render(request, 'manage_repairing.html', {'message': '安排成功'})
-	return render(request, 'manage_repairing.html', {'message': '安排错误'})
+		return render(request, 'manage_repairing.html', {'message': '安排成功', "kind": "CS", "username": username})
+	return render(request, 'manage_repairing.html', {'message': '安排错误', "kind": "CS", "username": username})
 
 
 def my_repairing(request):
@@ -653,7 +725,7 @@ def comment(request):
 		repairing.comment = request.POST.get('comment')
 		repairing.save()
 		my_repairing = models.Repairing.objects.filter(username=models.User.objects.get(id=request.session.get('id')).username)
-	return render(request, 'my_repairing.html', {'my_repairing': my_repairing, "message": "评价成功"})
+	return render(request, 'my_repairing.html', {'my_repairing': my_repairing, "message": "评价成功", "kind": "user", "username":models.User.objects.get(id=request.session.get('id')).username})
 
 
 def fix(request):
@@ -662,33 +734,36 @@ def fix(request):
 		repairing = models.Repairing.objects.get(repair_id=request.POST.get('selected_id'))
 		repairing.is_fix = True
 		repairing.save()
-		my_repairing = models.Repairing.objects.filter(username=models.User.objects.get(id=request.session.get('id')).username)
-	return render(request, 'my_repairing.html', {'my_repairing': my_repairing, "message": "处理成功"})
+		my_repairing = models.Repairing.objects.filter(repair_technician=models.Technician.objects.get(id=request.session.get('id')).username)
+	return render(request, 'my_repairing.html', {'my_repairing': my_repairing, "message": "处理成功", "kind": "tech", "username":models.Technician.objects.get(id=request.session.get('id')).username})
 
 
 def send_message(request):
 	message = ""
+	username = ""
+	username = models.Customerserver.objects.get(id=request.session.get('id')).username
 	if request.method == 'POST':
 		receiver = request.POST.get('username').strip()
-		sender = request.session.get('id')
+		sender = models.Customerserver.objects.get(id=request.session.get('id')).username
+		username = sender
 		title = request.POST.get('title').strip()
 		context = request.POST.get('context')
 		if not models.User.objects.filter(username=receiver).exists():
 			message = "用户不存在"
-			return render(request, 'send_message.html', {"message": message})
+			return render(request, 'send_message.html', {"message": message, "kind": "CS", "username": username})
 		elif not title or not context:
 			message = "标题或内容不能为空"
-			return render(request, 'send_message.html', {"message": message})
+			return render(request, 'send_message.html', {"message": message, "kind": "CS", "username": username})
 		else:
 			message = "发送成功"
 			new_message = models.MyMessage()
 			new_message.receiver = receiver
 			new_message.status = 1
-			new_message.sender = models.Customerserver.objects.get(id=sender).username
+			new_message.sender = sender
 			new_message.context = context
 			new_message.title = title
 			new_message.save()
-	return render(request, 'send_message.html', {"message": message})
+	return render(request, 'send_message.html', {"message": message, "kind": 'CS', "username": username})
 
 
 def my_message(request):
@@ -700,8 +775,8 @@ def my_message(request):
 		my_message = models.MyMessage.objects.filter(my_message_id=my_message_id).first()
 		my_message.status = 0
 		my_message.save()
-		return render(request, 'specific_message.html', {"my_message": my_message})
-	return render(request, 'my_message.html', {"message": message, "my_messages": my_messages})
+		return render(request, 'specific_message.html', {"my_message": my_message, "kind": 'user', "username": user.username})
+	return render(request, 'my_message.html', {"message": message, "my_messages": my_messages, "kind": 'user', "username": user.username})
 
 
 def create_apply(request):
@@ -718,7 +793,7 @@ def create_apply(request):
 		app.duration = request.POST.get('duration')
 		app.save()
 		message = "创建成功"
-	return render(request, 'create_apply.html', {'message': message})
+	return render(request, 'create_apply.html', {'message': message, "kind": "CS", "username": cs.username})
 
 
 # def export_app(request):
@@ -766,36 +841,43 @@ def remind(request):
 				new_message.title = "缴费通知"
 				new_message.save()
 				E.send_remind_email(models.User.objects.get(username=app.username).email, new_message.context)
-		return render(request, 'check_app.html', {'apps': apps, "csname": login_name})
+		return render(request, 'check_app.html', {'apps': apps, "csname": login_name, "kind": "CS"})
 
 
 def check_user(request):
 	users = models.User.objects.filter()
+	username = models.Customerserver.objects.get(id=request.session.get("id")).username
 	if request.method == 'POST':
 		if request.POST.get('delete_name'):
 			user = models.User.objects.get(username=request.POST.get('delete_name'))
+			apps = models.Application.objects.filter()
+			for i in apps:
+				if i.username == user.username and i.is_allowed == False:
+					i.delete()
 			user.delete()
 			users = models.User.objects.filter()
-			return render(request, 'check_user.html', {'users': users, 'message': "删除成功"})
+			return render(request, 'check_user.html', {'users': users, 'message': "删除成功", "kind": "CS", "username": username})
 		elif request.POST.get('selected_name'):
 			user = models.User.objects.get(username=request.POST.get('selected_name'))
-			return render(request, 'CS_show_info.html', {'user': user})
+			return render(request, 'CS_show_info.html', {'user': user, "kind": "CS", "username": username})
 		else:
 			if request.POST.get('username'):
 				users = users.filter(username=request.POST.get('username'))
 			if request.POST.get('user_id'):
 				users = users.filter(id=request.POST.get('user_id'))
-			return render(request, 'check_user.html', {'users': users})
-	return render(request, 'check_user.html', {'users': users})
+			return render(request, 'check_user.html', {'users': users, "kind": "CS", "username": username})
+	return render(request, 'check_user.html', {'users': users, "kind": "CS", "username": username})
 
 
 def CS_change_info(request):
+	kind = 'CS'
+	login_name = models.Customerserver.objects.get(id=request.session.get('id')).username
 	if request.method == 'POST':
-		username = models.User.objects.get(id=request.session.get('id')).username
-		password = models.User.objects.get(id=request.session.get('id')).password
-		email = models.User.objects.get(id=request.session.get('id')).email
-		real_name = models.User.objects.get(id=request.session.get('id')).real_name
-		ID_card = models.User.objects.get(id=request.session.get('id')).ID_card
+		username = models.User.objects.get(email=request.POST.get('email')).username
+		password = models.User.objects.get(email=request.POST.get('email')).password
+		email = models.User.objects.get(email=request.POST.get('email')).email
+		real_name = models.User.objects.get(email=request.POST.get('email')).real_name
+		ID_card = models.User.objects.get(email=request.POST.get('email')).ID_card
 		models.User.objects.filter(username=username).delete()
 		new_username = request.POST.get('username').strip()
 		new_password1 = request.POST.get('password1').strip()
@@ -809,3 +891,114 @@ def CS_change_info(request):
 		return render(request, 'check_user.html', locals())
 	else:
 		return render(request, 'CS_show_info.html', locals())
+
+
+def change_title(request):
+	username = models.Customerserver.objects.get(id=request.session.get('id')).username
+	Message = models.Message.objects.get(message_id=1)
+	if request.method == 'POST':
+		content = request.POST.get('content')
+		if content:
+			Message.content = content
+			Message.save()
+			return render(request, 'change_title.html', {"message": "修改成功", "title": Message.content, "kind": "CS", "username": username})
+		else:
+			return render(request, 'change_title.html', {"message": "内容不能为空", "title": Message.content, "kind": "CS", "username": username})
+	return render(request, 'change_title.html', {"title": Message.content, "kind": "CS", "username": username})
+
+
+def reporting(request):
+	message = ""
+	user = models.User.objects.get(id=request.session.get('id'))
+	if request.method == 'POST':
+		if request.POST.get('apply_id'):
+			apply_id = request.POST.get('apply_id')
+			request.session['apply_id'] = apply_id
+		if request.POST.get('title'):
+			print(2)
+			title = request.POST.get('title')
+		if request.POST.get('content'):
+			print(3)
+			content = request.POST.get('content')
+			files = request.FILES.getlist('picture', None)
+			if files:
+				for file in files:
+					if not str(file.name).__contains__("jpg"):
+						return render(request, 'reporting.html', {"message": "图片仅支持jpg格式", 'username': user.username, 'kind': 'user'})
+			else:
+				return render(request, 'reporting.html', {"message": "请上传图片", 'username': user.username, 'kind': 'user'})
+			if not content:
+				return render(request, 'reporting.html', {"message": "报修原因不能为空", 'username': user.username, 'kind': 'user'})
+			report = models.Reporting()
+			report.username = user.username
+			apply_id = request.session.get('apply_id')
+			report.apply_id = apply_id
+			report.title = title
+			report.content = content
+			report.save()
+			report.picture = "/demo1/" + "report_" + str(apply_id) + "_" + str(report.report_id) + "/"
+			os.makedirs(settings.MEDIA_ROOT + "/demo1/" + "report_" + str(apply_id) + "_" + str(report.report_id) + "/")
+			i = 1
+			for file in files:
+				filename = settings.MEDIA_ROOT + "/demo1/"+ "report_" + str(apply_id) + "_" + str(report.report_id) + "/" + str(i) + ".jpg"
+				with open(filename, 'wb') as pic:
+					for c in file.chunks():
+						pic.write(c)
+				i += 1
+			report.pic_num = i - 1
+			report.save()
+			return render(request, 'reporting.html', {"message": "添加成功", 'username': user.username, 'kind': 'user'})
+	return render(request, 'reporting.html', {'message': message, 'username': user.username, 'kind': 'user'})
+
+
+def my_reporting(request):
+	report = models.Reporting.objects.all()
+	login_name = ""
+	if request.session.get('id'):
+		user = models.User.objects.get(id=request.session.get('id'))
+		login_name = user.username
+	report = report.filter(username=login_name)
+	return render(request, 'my_reporting.html', {'reports': report, 'username': login_name, 'kind': 'user'})
+
+
+def manage_reporting(request):
+	report = models.Reporting.objects.all()
+	login_name = ""
+	if request.session.get('id'):
+		cs = models.Customerserver.objects.get(id=request.session.get('id'))
+		login_name = cs.username
+	if request.method == 'POST':
+		if request.POST.get('not_handled'):
+			report = report.filter(status=0)
+		if request.POST.get('report_id'):
+			report= report.filter(repair_id=request.POST.get('report_id'))
+		if request.POST.get('username'):
+			report = report.filter(username=request.POST.get('username'))
+	return render(request, 'manage_reporting.html', {"username": login_name, "reports": report, 'kind': 'CS'})
+
+
+def handle_reporting(request):
+	login_name = ""
+	if request.session.get('id'):
+		cs = models.Customerserver.objects.get(id=request.session.get('id'))
+		login_name = cs.username
+	if request.method == 'POST':
+		if request.POST.get('report_id'):
+			request.session['report_id'] = request.POST.get('report_id')
+			report = models.Reporting.objects.get(report_id=request.session.get('report_id'))
+		if request.POST.get('content'):
+			report = models.Reporting.objects.get(report_id=request.session.get('report_id'))
+			report.status = 1
+			report.handled_by = login_name
+			report.save()
+			new_message = models.MyMessage()
+			new_message.receiver = report.username
+			new_message.status = 1
+			new_message.sender = login_name
+			new_message.context = "您的投诉ID为"+str(report.report_id) + "的投诉已由客服" + str(login_name) + "处理。内容如下：" + request.POST.get('content')
+			new_message.title = "投诉结果通知"
+			new_message.save()
+			report.handled_content = new_message.context
+			report.save()
+			return render(request, 'manage_reporting.html', {'message': '处理成功', 'report': report, 'kind': 'CS', 'username': login_name})
+	return render(request, 'handle_reporting.html', {'report': report, 'kind': 'CS', 'username': login_name})

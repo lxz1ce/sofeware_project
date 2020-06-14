@@ -2,11 +2,69 @@
 <html lang="zh">
 <head>
     <meta charset="UTF-8">
+    <meta name="register" content="width=device-width,initial-scale=1">
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+	<script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <title>支付</title>
+    <style>
+        .bk{
+            background-color:white;
+            background-image:url("../static/images/background.jpg");
+            background-size: 100% 100%;
+            background-attachment: fixed;
+        }
+        .white{
+            color:white;
+        }
+
+        .myli{
+            background-color: #CCFFFF;
+        }
+    </style>
 </head>
-<body>
-    请您支付:{{ rent }}元
-    <br/>
-    <img src="../static/images/pay.jpg"  alt="二维码" height="500", width="400"/>
+<body class="bk logobg_style" >
+    
+    <div id="large-header" style="margin-top:200px;">
+        <canvas id="demo-canvas" width="2000" height="711" style="z-index: -1; position: absolute; margin-top: -200px;"></canvas>
+        <div class="container"  style="width:450px;height: 400px;border-radius: 10px; ">
+            <h1 style="color: white; text-align: center;">请您支付:{{ rent }}元</h1>
+            <br/>
+            <img src="../static/images/pay.jpg"  alt="二维码" height="500", width="400"/>
+        </div>
+        {% if message %}
+        <script type="text/javascript">
+            alert("{{ message }}");
+        </script>
+        {% endif %}
+    </div>
+    <script src="../static/js/TweenLite/TweenLite.min.js"></script>
+    <script src="../static/js/TweenLite/EasePack.min.js"></script>
+    <script src="../static/js/TweenLite/rAF.js"></script>
+    <script src="../static/js/TweenLite/demo-1.js"></script>
 </body>
+
+<script>
+    function change1(){
+        var key1 = document.getElementById("is_CS").checked;
+        if(key1==true)
+        {
+            var key2 = document.getElementById("is_tech");
+            if(key2.checked==true)
+                key2.checked=false
+        }
+    }
+</script>
+
+<script>
+    function change2(){
+        var key1 = document.getElementById("is_tech").checked;
+        if(key1==true)
+        {
+            var key2 = document.getElementById("is_CS");
+            if(key2.checked==true)
+                key2.checked=false
+        }
+    }
+</script>
 </html>

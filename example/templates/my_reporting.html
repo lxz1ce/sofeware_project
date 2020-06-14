@@ -1,54 +1,54 @@
 <!DOCTYPE html>
 <html lang="zh">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
-    <script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
-	<script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
-    <title>报修</title>
-    <style>
-        .navbar {
-            margin-bottom: 0;
-            position: fixed;
-            left: 0;
-            right: 0;
-        }
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+        <script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+	    <script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+        <title>我的投诉</title>
+        <style>
+            .navbar {
+                margin-bottom: 0;
+                position: fixed;
+                left: 0;
+                right: 0;
+            }
 
-        .sidebar {
-            left:0px;
-            padding-top: 30px;
-            padding: 0;
-            position: fixed;
-            top: 52px;
-            bottom: 0;
-            text-align: center;
-            box-shadow: 3px 3px 3px rgba(170,170,170,0.3);
-        }
+            .sidebar {
+                left:0px;
+                padding-top: 30px;
+                padding: 0;
+                position: fixed;
+                top: 52px;
+                bottom: 0;
+                text-align: center;
+                box-shadow: 3px 3px 3px rgba(170,170,170,0.3);
+            }
 
-        .content {
-            position: fixed;
-            top: 52px;
-            right: 0;
-            bottom: 0;
-            overflow: scroll;
-        }
+            .content {
+                position: fixed;
+                top: 52px;
+                right: 0;
+                bottom: 0;
+                overflow: scroll;
+            }
 
-        .active{
-            background-color: #cccc99;
-        }
+            .active{
+                background-color: #cccc99;
+            }
 
-        .myli{
+            .myli{
             background-color: #CCFFFF;
-        }
+            }
 
-        .bk{
-            background-image: url("../static/images/bkg.jpg");
-            background-size: 100% 100%;
-            background-attachment: fixed;
-        }
-    </style>
-</head>
+            .bk{
+                background-image: url("../static/images/bkg.jpg");
+                background-size: 100% 100%;
+                background-attachment: fixed;
+            }
+        </style>
+    </head>
 <body class="bk">
     <div class="navbar  navbar-fixed-top" style="position: fixed;background:#66cccc ">
         <span style="display:inline-block">
@@ -87,9 +87,8 @@
             {% endif %}
     </div>
     <div class="container">
-        <div class="row">
-            <div id="sidebar-collapse" class="col-sm-3 col-lg-2 sidebar collapse in" style="z-index:3">
-                <ul class="nav menu list-group" style="background-color: green;" >
+        <div id="sidebar-collapse" class="col-sm-3 col-lg-2 sidebar collapse in" style="z-index:3">
+            <ul class="nav menu list-group" style="background-color: green;" >
                     {% if kind == "CS" %}
                     <li class="myli list-group-item"><a href="../search_house"><span class="glyphicon glyphicon-home"></span>主页</a></li>
                     <li class="myli list-group-item"><a href="../show_info"><span class="glyphicon glyphicon-user"></span> 个人中心</a></li>
@@ -117,44 +116,63 @@
                     <li class="myli list-group-item"><a href="../show_info"><span class="glyphicon glyphicon-user"></span> 个人中心</a></li>
                     {% endif %}
                 </ul>
-                <HR style="FILTER: alpha(opacity=100,finishopacity=0,style=3)" width="80%" color=#987cb9 SIZE=3>
-            </div>
-
-            <div class="col-md-10 content pull-right" style="margin-top: 50px;">
-                <form action="/repairing/" method="post" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    <div class="row">
-                        <div class="col-md-6 col-md-offset-2 form-group">
-                            <label>报修房间ID(不可修改)</label><br>
-                            <input type="text" name="house_id" class ="form-control" value="{{ house_id }}" readonly/>
-                            <br/>
-                        </div>
-                        <div class="col-md-6 col-md-offset-2 form-group">
-                            <label>报修原因</label><br>
-<!--                            <input type="text" name="content" class ="form-control" placeholder="请填写保修原因"/>-->
-                            <textarea cols="90" rows="10" name="content" class ="form-control" placeholder="请填写保修原因"></textarea>
-                            <br/>
-                        </div>
-                        <div class="col-md-6 col-md-offset-2 form-group">
-                            <label>请上传照片描述(仅支持jpg文件)</label><br>
-                            <input type="file" name="picture" multiple=""/>
-                            <br/>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6 col-md-offset-2 form-group">
-                                <button type="submit"  class="btn btn-default">提交</button>
-                                <br/>
+            <HR style="FILTER: alpha(opacity=100,finishopacity=0,style=3)" width="80%" color=#987cb9 SIZE=3>
+        </div>
+        <div class="col-md-10 content pull-right" style="margin-top: 10px;">
+            <div>
+                <div>
+                    {% if kind == "user" %}
+                        {% if reports %}
+                            {% for i in reports %}
+                            <div class="col-md-6 col-sm-6" >
+                                <ul class="list-group" style="width:500px; ">
+                                    <label>投诉单编号：{{ i.report_id }}</label><br>
+                                    <li class="list-group-item">
+                                        <p style="font-size:15px; margin-top:8px;">投诉标题：{{ i.title }}</p>
+                                        <p style="font-size:15px; margin-top:8px;">相关订单id：{{ i.apply_id }}</p>
+                                    </li>
+                                    <li class="list-group-item">
+                                        <p style="font-size:15px; margin-top:8px;">处理状态：
+                                            {% if i.status == 1 %}
+                                                处理完毕
+                                            {% endif %}
+                                            {% if i.status == 0 %}
+                                                待处理
+                                            {% endif %}
+                                        </p>
+                                        {% if i.status == 1 %}
+                                            <p style="font-size:15px; margin-top:8px;">
+                                                为您处理投诉的是：{{ i.handled_by }}
+                                            </p>
+                                        {% endif %}
+                                    </li>
+                                    <li class="list-group-item">
+                                        <span style="display:inline-block">
+                                            <p style="font-size:15px; margin-top:8px;">投诉原因描述：</p>
+                                            <p style="font-size:15px; margin-top:0px; text-indent: 2em;">{{ i.content }}</p>
+                                        </span>
+                                    </li>
+                                    {% if i.status == 1 %}
+                                    <li class="list-group-item">
+                                        <span style="display:inline-block">
+                                            <p style="font-size:15px; margin-top:8px;">处理结果：</p>
+                                            <p style="font-size:15px; margin-top:0px; text-indent: 2em;">{{ i.handled_content }}</p>
+                                        </span>
+                                    </li>
+                                    {% endif %}
+                                </ul>
                             </div>
-                        </div>
-                    </div>
-                </form>
+                            {% endfor %}
+                        {% endif %}
+                    {% endif %}
+                {% if message %}
+                    <script type="text/javascript">
+                        alert("{{ message }}");
+                    </script>
+                {% endif %}
+                </div>
             </div>
         </div>
     </div>
-    {% if message %}
-        <script type="text/javascript">
-            alert("{{ message }}");
-        </script>
-    {% endif %}
 </body>
 </html>

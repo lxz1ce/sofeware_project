@@ -2,68 +2,278 @@
 <html lang="zh">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+	<script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <title>添加房源</title>
+    <style>
+        .bk{
+            background-image: url("../static/images/bkg.jpg");
+            background-size: 100% 100%;
+            background-attachment: fixed;
+        }
+        .navbar {
+            margin-bottom: 0;
+            position: fixed;
+            left: 0;
+            right: 0;
+        }
+        .myli{
+            background-color: #CCFFFF;
+        }
+        .sidebar {
+            left:0px;
+            padding-top: 30px;
+            padding: 0;
+            position: fixed;
+            top: 52px;
+            bottom: 0;
+            text-align: center;
+            box-shadow: 3px 3px 3px rgba(170,170,170,0.3);
+        }
+
+        .content {
+            position: fixed;
+            top: 52px;
+            right: 0;
+            bottom: 0;
+            overflow: scroll;
+        }
+
+        .active{
+            background-color: #cccc99;
+        }
+    </style>
 </head>
-<body>
-    <form action="/add_house/" method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        请输入房源名<input type="text" name="house_name"/>
-        <br/>
-        是否可短租<br/>
-        <input type="radio" name="short_leasing" value="True" checked/>是
-        <br/>
-        <input type="radio" name="short_leasing" value="False" checked/>否
-        <br/>
-        请输入短租费用 /天<input type="number" name="short_leasing_fee" value=0 />
-        <br/>
-        是否可长租<br/>
-        <input type="radio" name="long_leasing" value=True checked/>是
-        <br/>
-        <input type="radio" name="long_leasing" value=False checked/>否
-        <br/>
-        请输入长租费用 /月<input type="number" name="long_leasing_fee" value=0 />
-        <br/>
-        请输入房间类型
-        <br/>
-        <input type="radio" name="house_type" value=0 checked/>单人间
-        <br/>
-        <input type="radio" name="house_type" value=1 checked/>双人间
-        <br/>
-        <input type="radio" name="house_type" value=2 checked/>四人间
-        <br/>
-        请输入区域<select name="district">
-        <option value="东城区">东城区</option>
-        <option value="西城区">西城区</option>
-        <option value="朝阳区">朝阳区</option>
-        <option value="丰台区">丰台区</option>
-        <option value="石景山区">石景山区</option>
-        <option value="海淀区">海淀区</option>
-        <option value="顺义区">顺义区</option>
-        <option value="通州区">通州区</option>
-        <option value="大兴区">大兴区</option>
-        <option value="房山区">房山区</option>
-        <option value="门头沟区">门头沟区</option>
-        <option value="昌平区">昌平区</option>
-        <option value="平谷区">平谷区</option>
-        <option value="密云区">密云区</option>
-        <option value="怀柔区">怀柔区</option>
-        <option value="延庆区">延庆区</option>
-        </select>
-        <br/>
-        请输入地址<input type="text" name="address"/>
-        <br/>
-        请输入联系电话<input type="tel" name="contact_number">
-        <br/>
-        请上传照片(仅支持jpg文件)<input type="file" name="picture" multiple="">
-        <br/>
-        <button type="submit">提交</button>
-    </form>
-    <a href="../main">返回</a>
-    <br/>
-    {% if message %}
-        <script type="text/javascript">
-            alert("{{ message }}");
-        </script>
-    {% endif %}
+<body class="bk">
+    <div class="navbar  navbar-fixed-top" style="position: fixed;background:#66cccc ">
+        <span style="display:inline-block">
+        <a href="#" class="navbar-brand text-align='center'"><span font face="黑体" style="color:white ;">青年租房管理系统</span></a>
+        </span>
+        {% if kind == "guest" %}
+                <span style="float:right; margin-top:8px">
+                    <a href="../register"><button class="btn btn-default">注册</button></a>
+                </span>
+                <span style="float:right; margin-top:8px">
+                    <a href="../login"><button class="btn btn-default">登录</button></a>
+                </span>
+            {% else %}
+                <span style="float:right; margin-top:8px">
+                    <a href="../logout"><button class="btn btn-default">退出</button></a>
+                </span>
+                <span style="float:right; margin-top:8px">
+                    <a href="../show_info"><button class="btn btn-default">个人中心</button></a>
+                </span>
+                <span style="float:right; margin-top:0px">
+                    <a href="#" class="navbar-brand text-align='center'">
+                        <span font face="黑体" style="color:white ;">
+                        {% if kind == "CS" %}
+                            客服
+                        {% endif %}
+                        {% if kind == "user" %}
+                            用户
+                        {% endif %}
+                        {% if kind == "tech" %}
+                            维修人员
+                        {% endif %}
+                        ：{{ username }}
+                        </span>
+                    </a>
+                </span>
+            {% endif %}
+    </div>
+    <div class="container">
+        <div class="row">
+            <div id="sidebar-collapse" class="col-sm-3 col-lg-2 sidebar collapse in" style="z-index:3">
+                <ul class="nav menu list-group" style="background-color: green;" >
+                    {% if kind == "CS" %}
+                    <li class="myli list-group-item"><a href="../search_house"><span class="glyphicon glyphicon-home"></span>主页</a></li>
+                    <li class="myli list-group-item"><a href="../show_info"><span class="glyphicon glyphicon-user"></span> 个人中心</a></li>
+                    <li class="myli list-group-item"><a href="../add_technician"><span class="glyphicon glyphicon-plus"></span>添加工单师傅</a></li>
+                    <li class="myli list-group-item"><a href="../add_house"><span class="glyphicon glyphicon-plus-sign"></span>添加房源</a></li>
+                    <li class="myli list-group-item"><a href="../check_app"><span class="glyphicon glyphicon-eye-open"></span>审核租房申请</a></li>
+                    <li class="myli list-group-item"><a href="../send_message"><span class="glyphicon glyphicon-envelope"></span>发送消息</a></li>
+                    <li class="myli list-group-item"><a href="../create_apply"><span class="glyphicon glyphicon-bookmark"></span>创建租房订单</a></li>
+                    <li class="myli list-group-item"><a href="../manage_repairing"><span class="glyphicon glyphicon-bell"></span>管理保修</a></li>
+                    <li class="myli list-group-item"><a href="../manage_reporting"><span class="glyphicon glyphicon-bell"></span>管理投诉</a></li>
+                    <li class="myli list-group-item"><a href="../check_user"><span class="glyphicon glyphicon-eye-open"></span>查看用户</a></li>
+                    <li class="myli list-group-item"><a href="../change_title"><span class="glyphicon glyphicon-eye-open"></span>公告管理</a></li>
+                    {% endif %}
+                    {% if kind == "user" %}
+                    <li class="myli list-group-item" ><a href="../search_house"><span class="glyphicon glyphicon-home"></span>主页</a></li>
+                    <li class="myli list-group-item"><a href="../show_info"><span class="glyphicon glyphicon-user"></span> 个人中心</a></li>
+                    <li class="myli list-group-item"><a href="../my_app"><span class="glyphicon glyphicon-flag"></span>我的租房申请</a></li>
+                    <li class="myli list-group-item"><a href="../my_message"><span class="glyphicon glyphicon-comment"></span>我的消息{{ unread }}</a></li>
+                    <li class="myli list-group-item"><a href="../my_repairing"><span class="glyphicon glyphicon-tower"></span>我的报修</a></li>
+                    <li class="myli list-group-item"><a href="../my_reporting"><span class="glyphicon glyphicon-tower"></span>我的投诉</a></li>
+                    {% endif %}
+                    {% if kind == "tech" %}
+                    <li class="myli list-group-item"><a href="../search_house"><span class="glyphicon glyphicon-home"></span>主页</a></li>
+                    <li class="myli list-group-item"><a href="../my_repairing"><span class="glyphicon glyphicon-tower"></span>我的工单</a></li>
+                    <li class="myli list-group-item"><a href="../show_info"><span class="glyphicon glyphicon-user"></span> 个人中心</a></li>
+                    {% endif %}
+                </ul>
+                <HR style="FILTER: alpha(opacity=100,finishopacity=0,style=3)" width="80%" color=#987cb9 SIZE=3>
+            </div>
+            <div class="col-md-10 content pull-right" style="margin-top: 50px;">
+                <form action="/add_house/" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-6 col-md-offset-2 form-group">
+                            <label>请输入房源名</label><br>
+                            <input type="text" name="house_name" class="form-control"/>
+                            <br/>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 col-md-offset-2 form-group">
+                            <input id="short_leasing" type="radio" name="short_leasing" value="True" checked onclick="show1()"/>短租
+                            <br/>
+                            <input id="short_leasing2" type="radio" name="short_leasing" value="False" checked style="display: none;"/>
+                            <br/>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 col-md-offset-2 form-group">
+                            <input id="long_leasing" type="radio" name="long_leasing"  value=True checked onclick="show2()"/>长租
+                            <br/>
+                            <input id="long_leasing2" type="radio" name="long_leasing"  value=False checked style="display: none;"/>
+                            <br/>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div id="short" class="col-md-6 col-md-offset-2 form-group" style="display:none">
+                            <label>请输入短租费用 元/天</label><br>
+                            <input type="number" name="short_leasing_fee" value=0 class ="form-control" min="0" max="10000" />
+                            <br/>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div id="long" class="col-md-6 col-md-offset-2 form-group" style="display:none">
+                            <label>请输入长租费用 元/月</label><br>
+                            <input type="number" name="long_leasing_fee" class ="form-control" value=0 min="0" max="1000000"/>
+                            <br/>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 col-md-offset-2 form-group">
+                            <label>请输入房间类型</label><br>
+                            <input type="radio" name="house_type"  value=0 checked/>单人间
+                            <br/>
+                            <input type="radio" name="house_type"  value=1 checked/>双人间
+                            <br/>
+                            <input type="radio" name="house_type"  value=2 checked/>四人间
+                            <br/>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 col-md-offset-2 form-group">
+                            <label>请输入区域</label><br>
+                            <select name="district" class="form-control">
+                                <option value="东城区">东城区</option>
+                                <option value="西城区">西城区</option>
+                                <option value="朝阳区">朝阳区</option>
+                                <option value="丰台区">丰台区</option>
+                                <option value="石景山区">石景山区</option>
+                                <option value="海淀区">海淀区</option>
+                                <option value="顺义区">顺义区</option>
+                                <option value="通州区">通州区</option>
+                                <option value="大兴区">大兴区</option>
+                                <option value="房山区">房山区</option>
+                                <option value="门头沟区">门头沟区</option>
+                                <option value="昌平区">昌平区</option>
+                                <option value="平谷区">平谷区</option>
+                                <option value="密云区">密云区</option>
+                                <option value="怀柔区">怀柔区</option>
+                                <option value="延庆区">延庆区</option>
+                                </select>
+                                <br/>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 col-md-offset-2 form-group">
+                            <label>请输入地址</label><br>
+                            <input type="text" class ="form-control" name="address"/>
+                            <br/>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 col-md-offset-2 form-group">
+                            <label>请输入联系电话</label><br>
+                            <input type="tel" class ="form-control" name="contact_number">
+                            <br/>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 col-md-offset-2 form-group">
+                            <label>请上传照片(仅支持jpg文件)</label><br>
+                            <input type="file"  name="picture" multiple="">
+                            <br/>
+                        </div>
+                    </div>
+                    <div class="row" >
+                        <div class="form-group col-md-6 col-md-offset-2">
+                            <button id="submitButton" type="submit" class="btn btn-default" >提交</button>
+                        </div>
+                    </div>
+                </form>
+                
+                <br/>
+                {% if message %}
+                    <script type="text/javascript">
+                        alert("{{ message }}");
+                    </script>
+                {% endif %}
+            </div>
+        </div>
+    </div>
 </body>
+<script>
+    function show1()
+    {
+        var short_play = document.getElementById("short");
+        var short_button = document.getElementById("short_leasing");
+        var long_play = document.getElementById("long");
+        var long_button = document.getElementById("long_leasing");
+        var short_button2 = document.getElementById("short_leasing2");
+        var long_button2 = document.getElementById("long_leasing2");
+        if(short_button.checked==true)
+        {
+            short_play.style.display="inline";
+            long_play.style.display="none";
+            long_button2.checked=true;
+            long_button.checked=false;
+            short_button2.checked=false;
+        }
+        else
+        {
+            short_play.style.display="none";
+        }
+    }
+    function show2()
+    {
+        var long_play = document.getElementById("long");
+        var long_button = document.getElementById("long_leasing");
+        var short_play = document.getElementById("short");
+        var short_button = document.getElementById("short_leasing");
+        var long_button2 = document.getElementById("long_leasing2");
+        var short_button2 = document.getElementById("short_leasing2");
+        if(long_button.checked==true)
+        {
+            long_play.style.display="inline";
+            short_play.style.display="none";
+            short_button2.checked=true;
+            long_button2.checked=false;
+            short_button.checked=false;
+        }
+        else
+        {
+            long_play.style.display="none";
+        }
+    }
+</script>
 </html>
+
+
+

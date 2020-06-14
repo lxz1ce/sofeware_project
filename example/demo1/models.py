@@ -112,9 +112,15 @@ class Repairing(models.Model):
 class Reporting(models.Model):
 	report_id = models.AutoField(primary_key=True)
 	username = models.CharField(max_length=10)
-	bad_user = models.CharField(max_length=10)
-	house_id = models.IntegerField()
+	apply_id = models.IntegerField()
+	title = models.CharField(max_length=40)
 	content = models.CharField(max_length=200)
+	picture = models.ImageField('照片', upload_to='demo1/', blank=True, null=True)
+	pic_num = models.IntegerField(default=0)
+	status_choice = [(0, '待处理'), (1, '已处理')]
+	status = models.IntegerField(choices=status_choice, verbose_name='处理状态', default=0)
+	handled_by = models.CharField(max_length=10, blank=True, null=True)
+	handled_content = models.CharField(max_length=200, blank=True, null=True)
 
 	def __str__(self):
 		return str(self.report_id)

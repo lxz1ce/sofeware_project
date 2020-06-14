@@ -1,47 +1,271 @@
 <!DOCTYPE html>
 <html lang="zh">
-<head>
-    <meta charset="UTF-8">
-    <title>管理保修</title>
-</head>
-<body>
-    <form action="/manage_repairing/" method="post">
-        {% csrf_token %}
-        搜索申请ID：<input type="text" name="repairing_id"/>
-        搜索用户名：<input type="text" name="username"/>
-        搜索房源ID：<input type="text" name="house_id"/>
-        查看未被审核的：<input type="radio" name="not_allowed"/>
-        <input type="submit"/>
-    </form>
-    <a href="../main">返回</a>
-    <br/>
-    {% if repairing %}
-        {% for i in repairing %}
-            <tr>
-                <td>repairing_id:{{ i.repair_id }} </td>
-                <td>username:{{ i.username }} </td>
-                <td>house_id:{{ i.house_id }} </td>
-                <td>is_allow:{{ i.is_allow }} </td>
-                <form action="/arrange_repairing/" method="post">
-                {% csrf_token %}
-                <input name="repairing_id" type="hidden" value="{{i.repair_id}}"/>
-                工单师傅:<input name="technician" type="text"/>
-                <br/>
-                <input type="submit" value="将报修分配给工单师傅"/>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css"> 
+        <script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+	    <script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+        <title>Document</title>
+        <style>
+            .navbar {
+                margin-bottom: 0;
+                position: fixed;
+                left: 0;
+                right: 0;
+            }
+    
+            .sidebar {
+                left:0px;
+                padding-top: 30px;
+                padding: 0;
+                position: fixed;
+                top: 52px;
+                bottom: 0;
+                text-align: center;
+                box-shadow: 3px 3px 3px rgba(170,170,170,0.3);
+            }
+    
+            .content {
+                position: fixed;
+                top: 52px;
+                right: 0;
+                bottom: 0;
+                overflow: scroll;
+            }
+    
+            .active{
+                background-color: #cccc99;
+            }
+
+            .myli{
+            background-color: #CCFFFF;
+            }
+
+            .bk{
+                background-image: url("../static/images/bkg.jpg");
+                background-size: 100% 100%;
+                background-attachment: fixed;
+            }
+        </style>
+    </head>
+<body class="bk">
+    <div class="navbar  navbar-fixed-top" style="position: fixed;background:#66cccc ">
+        <span style="display:inline-block">
+        <a href="#" class="navbar-brand text-align='center'"><span font face="黑体" style="color:white ;">青年租房管理系统</span></a>
+        </span>
+        {% if kind == "guest" %}
+                <span style="float:right; margin-top:8px">
+                    <a href="../register"><button class="btn btn-default">注册</button></a>
+                </span>
+                <span style="float:right; margin-top:8px">
+                    <a href="../login"><button class="btn btn-default">登录</button></a>
+                </span>
+            {% else %}
+                <span style="float:right; margin-top:8px">
+                    <a href="../logout"><button class="btn btn-default">退出</button></a>
+                </span>
+                <span style="float:right; margin-top:8px">
+                    <a href="../show_info"><button class="btn btn-default">个人中心</button></a>
+                </span>
+                <span style="float:right; margin-top:0px">
+                    <a href="#" class="navbar-brand text-align='center'">
+                        <span font face="黑体" style="color:white ;">
+                        {% if kind == "CS" %}
+                            客服
+                        {% endif %}
+                        {% if kind == "user" %}
+                            用户
+                        {% endif %}
+                        {% if kind == "tech" %}
+                            维修人员
+                        {% endif %}
+                        ：{{ username }}
+                        </span>
+                    </a>
+                </span>
+            {% endif %}
+    </div>
+    <div class="container">
+        <div class="row">
+            <div id="sidebar-collapse" class="col-sm-3 col-lg-2 sidebar collapse in" style="z-index:3">
+                <ul class="nav menu list-group" style="background-color: green;" >
+                    {% if kind == "CS" %}
+                    <li class="myli list-group-item"><a href="../search_house"><span class="glyphicon glyphicon-home"></span>主页</a></li>
+                    <li class="myli list-group-item"><a href="../show_info"><span class="glyphicon glyphicon-user"></span> 个人中心</a></li>
+                    <li class="myli list-group-item"><a href="../add_technician"><span class="glyphicon glyphicon-plus"></span>添加工单师傅</a></li>
+                    <li class="myli list-group-item"><a href="../add_house"><span class="glyphicon glyphicon-plus-sign"></span>添加房源</a></li>
+                    <li class="myli list-group-item"><a href="../check_app"><span class="glyphicon glyphicon-eye-open"></span>审核租房申请</a></li>
+                    <li class="myli list-group-item"><a href="../send_message"><span class="glyphicon glyphicon-envelope"></span>发送消息</a></li>
+                    <li class="myli list-group-item"><a href="../create_apply"><span class="glyphicon glyphicon-bookmark"></span>创建租房订单</a></li>
+                    <li class="myli list-group-item"><a href="../manage_repairing"><span class="glyphicon glyphicon-bell"></span>管理保修</a></li>
+                    <li class="myli list-group-item"><a href="../manage_reporting"><span class="glyphicon glyphicon-bell"></span>管理投诉</a></li>
+                    <li class="myli list-group-item"><a href="../check_user"><span class="glyphicon glyphicon-eye-open"></span>查看用户</a></li>
+                    <li class="myli list-group-item"><a href="../change_title"><span class="glyphicon glyphicon-eye-open"></span>公告管理</a></li>
+                    {% endif %}
+                    {% if kind == "user" %}
+                    <li class="myli list-group-item" ><a href="../search_house"><span class="glyphicon glyphicon-home"></span>主页</a></li>
+                    <li class="myli list-group-item"><a href="../show_info"><span class="glyphicon glyphicon-user"></span> 个人中心</a></li>
+                    <li class="myli list-group-item"><a href="../my_app"><span class="glyphicon glyphicon-flag"></span>我的租房申请</a></li>
+                    <li class="myli list-group-item"><a href="../my_message"><span class="glyphicon glyphicon-comment"></span>我的消息{{ unread }}</a></li>
+                    <li class="myli list-group-item"><a href="../my_repairing"><span class="glyphicon glyphicon-tower"></span>我的报修</a></li>
+                    <li class="myli list-group-item"><a href="../my_reporting"><span class="glyphicon glyphicon-tower"></span>我的投诉</a></li>
+                    {% endif %}
+                    {% if kind == "tech" %}
+                    <li class="myli list-group-item"><a href="../search_house"><span class="glyphicon glyphicon-home"></span>主页</a></li>
+                    <li class="myli list-group-item"><a href="../my_repairing"><span class="glyphicon glyphicon-tower"></span>我的工单</a></li>
+                    <li class="myli list-group-item"><a href="../show_info"><span class="glyphicon glyphicon-user"></span> 个人中心</a></li>
+                    {% endif %}
+                </ul>
+                <HR style="FILTER: alpha(opacity=100,finishopacity=0,style=3)" width="80%" color=#987cb9 SIZE=3>
+            </div>
+            <div class="col-md-10 content pull-right" style="margin-top: 50px;">
+                <form action="/manage_repairing/" method="post" role="form">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-6 col-md-offset-2 form-group">
+                            <label>搜索申请ID</label><br>
+                            <input type="text" name="repairing_id" class ="form-control"/>
+                            <br/>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 col-md-offset-2 form-group">
+                            <label>搜索用户名</label><br>
+                            <input type="text" name="username" class ="form-control"/>
+                            <br/>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 col-md-offset-2 form-group">
+                            <label>搜索房源ID</label><br>
+                            <input type="text" name="house_id" class ="form-control"/>
+                            <br/>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 col-md-offset-2 form-group">
+                            <label>查看未被审核的</label><br>
+                            <input type="radio" name="not_allowed"/>
+                            <br/>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 col-md-offset-2 form-group">
+                            <span style="display:inline-block">
+                            <button type="submit"  class="btn btn-default">提交</button>
+                            </span>
+                            <span style="float:right; margin-top:0px">
+                            </span>
+                            <br/>
+                        </div>
+                    </div>
                 </form>
-                <form action="/cancel_repairing/" method="post">
-                {% csrf_token %}
-                <input name="repairing_id" type="hidden" value="{{i.repair_id}}"/>
-                <input type="submit" value="拒绝报修"/>
-                </form>
-            </tr>
-            <br/>
-        {% endfor %}
-    {% endif %}
-    {% if message %}
-        <script type="text/javascript">
-            alert("{{ message }}");
-        </script>
-    {% endif %}
+                <br/><br/>
+                {% if repairing %}
+                    {% for i in repairing %}
+                            <div class="col-md-6 col-sm-6" >
+                                <ul class="list-group" style="width:500px; ">
+                                    <label>维修单编号：{{ i.repair_id }}</label><br>
+                                    <li class="list-group-item myli">
+                                        <p style="font-size:15px; margin-top:8px;">房源id：{{ i.house_id }}</p>
+                                    </li>
+                                    <li class="list-group-item myli">
+                                        <p style="font-size:15px; margin-top:8px;">租客名称：{{ i.username }}</p>
+                                    </li>
+                                    <li class="list-group-item myli">
+                                        <p style="font-size:15px; margin-top:8px;">审核状态：
+                                            {% if i.is_allow == True %}
+                                                审核通过
+                                            {% endif %}
+                                            {% if i.is_allow == False %}
+                                                等待审核
+                                            {% endif %}
+                                        </p>
+                                    </li>
+                                    <li class="list-group-item myli">
+                                        <p style="font-size:15px; margin-top:8px;">处理状态：
+                                            {% if i.is_allow == False %}
+                                                待审核
+                                            {% endif %}
+                                            {% if i.is_allow == True %}
+                                                {% if i.is_fix == True %}
+                                                    处理完毕
+                                                {% endif %}
+                                                {% if i.is_fix == False %}
+                                                    师傅处理中
+                                                {% endif %}
+                                            {% endif %}
+                                        </p>
+                                        {% if i.is_allow == True %}
+                                            <p style="font-size:15px; margin-top:8px;">
+                                                处理工单的是：{{ i.repair_technician }}
+                                            </p>
+                                        {% endif %}
+                                    </li>
+                                    <li class="list-group-item myli">
+                                        <span style="display:inline-block">
+                                            <p style="font-size:15px; margin-top:8px;">报修原因描述：</p>
+                                            <p style="font-size:15px; margin-top:0px; text-indent: 2em;">{{ i.content }}</p>
+                                        </span>
+                                    </li>
+                                    {% if i.is_fix == True %}
+                                        {% if i.comment == 4 %}
+                                        {% endif %}
+                                        <li class="list-group-item myli">
+                                            <span style="display:inline-block">
+                                                <p style="font-size:15px; margin-top:8px;">用户反馈：</p>
+                                                <p style="font-size:15px; margin-top:0px; text-indent: 2em;">
+                                                    {% if i.comment == 4 %}
+                                                            用户尚未评价
+                                                    {% elif i.comment == 0 %}
+                                                            不满意
+                                                    {% elif i.comment == 1 %}
+                                                            不太满意
+                                                    {% elif i.comment == 2 %}
+                                                            基本满意
+                                                    {% else %}
+                                                            十分满意
+                                                    {% endif %}
+                                                </p>
+                                            </span>
+                                        </li>
+                                    {% else %}
+                                    {% if i.is_allow == False%}
+                                    <li class="list-group-item myli">
+                                        <p style="font-size:15px; margin-top:8px;">处理工单：</p>
+                                        <span style="float:right; margin-top:-14px">
+                                            <form action="/cancel_repairing/" method="post">
+                                                {% csrf_token %}
+                                                <input name="repairing_id" type="hidden" value="{{i.repair_id}}"/>
+                                                <button type="submit"  class="btn btn-default" style="margin-top:52px;">拒绝报修</button>
+                                            </form>
+                                        </span>
+                                            <form action="/arrange_repairing/" method="post">
+                                            {% csrf_token %}
+                                            <input name="repairing_id" type="hidden" value="{{i.repair_id}}" />
+                                                <span style="display:inline-block">
+                                                    <p style="font-size:15px; margin-top:8px;">分配师傅：</p>
+                                                    <input type="text" name="technician" class ="form-control" value="{{ user.username }}" />
+                                                </span>
+                                            <span style="float:right; margin-top:-14px">
+                                                <button type="submit"  class="btn btn-default" style="margin-top:52px;">确认分配</button>
+                                            </span>
+                                            </form>
+                                    </li>
+                                    {% endif %}
+                                    {% endif %}
+                                </ul>
+                            </div>
+                {% endfor %}
+            {% endif %}
+            {% if message %}
+            <script type="text/javascript">
+                alert("{{ message }}");
+            </script>
+            {% endif %}
+            </div>
+        </div>
+    </div>
 </body>
 </html>

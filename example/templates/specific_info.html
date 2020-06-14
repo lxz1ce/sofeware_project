@@ -1,56 +1,330 @@
 <!DOCTYPE html>
 <html lang="zn">
+
 <head>
     <meta charset="UTF-8">
+    <meta name="specific_info" content="width=device-width,initial-scale=1">
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+	<script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <title>房源信息</title>
-</head>
-<body>
-     {% if house %}
-            <tr>
-                <td>{{ house.house_name }}</td>
-                <td>{{ house.short_leasing }}</td>
-                <td>{{ house.short_leasing_fee }}</td>
-                <td>{{ house.long_leasing }}</td>
-                <td>{{ house.long_leasing_fee }}</td>
-                <td>{{ house.house_type }}</td>
-                <td>{{ house.district }}</td>
-                <td>{{ house.address }}</td>
-                <td>{{ house.contact_number }}</td>
-            </tr>
-            <form action="/specific_info/" method="post">
-                {% csrf_token %}
-                {% if house.short_leasing %}
-                    短租<input name="type" type="radio" value="short"/>
-                    起始时间<input name="s_y" type="number"/>年<input name="s_m" type="number">月<input name="s_d" type="number">日
-                    租房时长<input name="duration" type="number"/>天
+    <style>
+        .bk{
+            background-color: white;
+        }
+        .white {
+            color: white;
+        }
 
-                {% endif %}
+        .navbar {
+            margin-bottom: 0;
+            position: fixed;
+            left: 0;
+            right: 0;
+        }
+
+        .picture-small-li {
+            display: inline-block;
+            border: 1px solid #000;
+            margin-right: 5px;
+            width: 60px;
+            height: 60px;
+            box-sizing: border-box;
+        }
+
+        .container {
+            margin-top: 51px;
+            width: 100%;
+            height: 100%;
+            padding: 0 40px;
+        }
+
+        .picture-big {
+            margin: 20px 0;
+        }
+
+        .picture-big img {
+            border-radius: 3px;
+            width: 350px;
+            height: 350px;
+            padding: 3px;
+            border: 1px solid #ccc;
+        }
+
+        .picture-small {
+            display: flex;
+            width: 100%;
+        }
+
+        .picture-small-li img {
+            width: 58px;
+            height: 58px;
+            box-sizing: border-box;
+        }
+
+        ul {
+            padding: 0;
+        }
+
+        li:hover {
+            box-sizing: border-box;
+            border: 2px solid #ff4400;
+            cursor: pointer
+        }
+
+        .title {
+            min-height: 21px;
+            font-size: 22px;
+            font-weight: 700;
+            line-height: 21px;
+            color: #3C3C3C;
+        }
+
+        span {
+            padding-right: 10px;
+        }
+
+        label {
+            margin-bottom: 0;
+        }
+
+        .flex-align {
+            display: flex;
+            align-items: center;
+        }
+
+        input[type=checkbox] {
+            margin-right: 10px;
+            margin-top: 0;
+            height: 20px;
+            width: 20px;
+        }
+
+        input[type=number] {
+            vertical-align: top;
+            box-sizing: border-box;
+            height: 24px;
+            line-height: 24px;
+            font-size: 14px;
+            padding-left: 6px;
+            border: 1px solid rgba(0, 0, 0, .2);
+            border-radius: 2px;
+            width: 100px;
+        }
+
+        .price-text {
+            padding: 0 6px;
+        }
+
+        .myli{
+            background-color: #CCFFFF;
+        }
+    </style>
+</head>
+
+<body class="bk">
+    {% if house %}
+    <div class="container">
+        <div class="navbar  navbar-fixed-top" style="position: fixed;background:#66cccc ">
+            <span style="display:inline-block">
+            <a href="#" class="navbar-brand text-align='center'"><span font face="黑体" style="color:white ;">青年租房管理系统</span></a>
+            </span>
+            {% if kind == "guest" %}
+                <span style="float:right; margin-top:8px">
+                    <button class="btn btn-default"><a href="../register">注册</a></button>
+                </span>
+                <span style="float:right; margin-top:8px">
+                    <button class="btn btn-default"><a href="../login">登录</a></button>
+                </span>
+            {% else %}
+                <span style="float:right; margin-top:8px">
+                    <button class="btn btn-default"><a href="../logout">退出</a></button>
+                </span>
+                <span style="float:right; margin-top:8px">
+                    <button class="btn btn-default"><a href="../show_info">个人中心</a></button>
+                </span>
+                <span style="float:right; margin-top:0px">
+                    <a href="#" class="navbar-brand text-align='center'">
+                        <span font face="黑体" style="color:white ;">
+                        {% if kind == "CS" %}
+                            客服
+                        {% endif %}
+                        {% if kind == "user" %}
+                            用户
+                        {% endif %}
+                        {% if kind == "tech" %}
+                            维修人员
+                        {% endif %}
+                        ：{{ username }}
+                        </span>
+                    </a>
+                </span>
+            {% endif %}
+        </div>
+        <div class="row" style="width: 80%; margin-top:20px">
+            <div class="col-md-6">
+                <div class="picture-big">
+                    <img src="../static/media{{house.picture}}1.jpg" onerror="this.src='../static/images/background.jpg'" class="img-responsive" id="pic"
+                        style="border-radius: 3px; width: 350px; height: 350px; padding: 3px; border: 1px solid #ccc;" />
+                </div>
+                <div class="picture-small">
+                    <ul>
+                        <li id="li01" class="picture-small-li">
+                            <img style="width:100%; height:100%;" src="../static/media{{house.picture}}1.jpg"
+                                onerror="this.src='../static/images/background.jpg'" />
+                        </li>
+                        <li id="li02" class="picture-small-li">
+                            <img style="width:100%; height:100%;" src="../static/media{{house.picture}}2.jpg"
+                                onerror="this.src='../static/images/background.jpg'" />
+                        </li>
+                        <li id="li03" class="picture-small-li"><img style="width:100%; height:100%;"
+                                src="../static/media{{house.picture}}3.jpg"
+                                onerror="this.src='../static/images/background.jpg'" />
+                        </li>
+                        <li id="li04" class="picture-small-li">
+                            <img style="width:100%; height:100%;" src="../static/media{{house.picture}}4.jpg"
+                                onerror="this.src='../static/images/background.jpg'" />
+                        </li>
+                        <li id="li05" class="picture-small-li">
+                            <img style="width:100%; height:100%;" src="../static/media{{house.picture}}5.jpg"
+                                onerror="this.src='../static/images/background.jpg'" />
+                        </li>  
+                    </ul>
+                </div>
+            </div>
+            <div class="col-md-6" style="margin-top:25px">
+                <div class="picture-big">
+                    <p class="title">房源名称：{{ house.house_name }}</p>
+                    <p>所在区域：{{ house.district }}</p>
+                    <p>详细地址：{{ house.address }}</p>
+                    <p>房源id：{{ house.house_id }}</p>
+                    <p style="font-size: 16px;">联系电话： <label style="font-size: 20px">{{ house.contact_number }}</label></p>
+
+                    <!-- <p>{{ house.short_leasing }}</p>
+                    <p>{{ house.short_leasing_fee }}</p>
+                    <p>{{ house.long_leasing }}</p>
+                    <p>{{ house.long_leasing_fee }}</p>
+                    <p>{{ house.house_type }}</p> -->
+
+                </div>
+                <form action="/specific_info/" method="post">
+                    {% csrf_token %}
+                    {% if house.short_leasing %}
+                    {% if kind == "user" %}
+                    <div class="row">
+                        <div class="col-md-6 form-group flex-align">
+                            <label><span class="font-black">短租</span></label>
+                            <input name="type" type="checkbox" value="short" />
+                        </div>
+                        <div class="col-md-6 form-group flex-align">
+                            <label><span class="font-black">租房时长</span></label>
+                            <input name="duration" type="number" required/>
+                            <label class="price-text">天</label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 form-group flex-align">
+                            <label><span class="font-black">起始时间</span></label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 form-group flex-align">
+                            <input name="s_y" type="number" min="2000" max="3000" required/>
+                            <label class="price-text">年</label>
+                            <input name="s_m" type="number" min="1" max="12" required>
+                            <label class="price-text">月</label>
+                            <input name="s_d" type="number" min="1" max="31" required>
+                            <label class="price-text">日</label>
+                            <br>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% endif %}
+                    {% if house.long_leasing %}
+                    {% if kind == "user" %}
+                    <div class="row">
+                        <div class="col-md-6 form-group flex-align">
+                            <label><span class="font-black">长租</span></label>
+                            <input name="type" type="checkbox" value="long" />
+                        </div>
+                        <div class="col-md-6 form-group flex-align">
+                            <label><span class="font-black">租房时长</span></label>
+                            <input name="duration" type="number" required/>
+                            <label class="price-text">月</label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 form-group flex-align">
+                            <label><span class="font-black">起始时间</span></label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 form-group flex-align">
+                            <input name="s_y" type="number" min="2000" max="3000" required/>
+                            <label class="price-text">年</label>
+                            <input name="s_m" type="number" min="1" max="12" required>
+                            <label class="price-text">月</label>
+                            <input name="s_d" type="number" min="1" max="31" required>
+                            <label class="price-text">日</label>
+                            <br>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% endif %}
+                    <div class="row">
+                        <div class="col-md-6 form-group flex-align">
+                            <input name="selected_id" type="hidden" value="{{house.house_id}}">
+                            {% if kind == "user" %}
+                            <input class="btn btn-primary" type="submit" value="确认租房" />
+                            {% endif %}
+                            <button class="btn btn-warning" style="width: 80px;margin-left: 20px;">
+                                <a href="../search_house" style="color: #fff;">返回</a>
+                            </button>
+                        </div>
+                    </div>
+
+                </form>
+                <br />
                 {% if house.long_leasing %}
-                    长租<input name="type" type="radio" value="long"/>
-                    起始时间<input name="s_y" type="number"/>年<input name="s_m" type="number">月<input name="s_d" type="number">日
-                    租房时长<input name="duration" type="number"/>月
-                {% endif %}
-                <input name="selected_id" type="hidden" value="{{house.house_id}}">
-                <input type="submit" value="确认租房"/>
-            </form>
-            <br/>
-            {% if house.long_leasing %}
-            {% if apps %}
+                {% if apps %}
                 {% for app in apps %}
-                    <tr>
+                <tr>
                     <td>起始时间：{{ app.s_y }}.{{ app.s_m }}.{{ app.s_d }}</td>
                     <td>持续时间：{{ app.duration }}</td>
-                    </tr>
-                    <br/>
+                </tr>
+                <br />
                 {% endfor %}
-            {% endif %}
-            {% endif %}
-    {% endif %}
-     <a href="../main">返回</a>
+                {% endif %}
+                {% endif %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
     {% if message %}
-        <script type="text/javascript">
-            alert("{{ message }}");
-        </script>
+    <script type="text/javascript">
+        alert("{{ message }}");
+    </script>
     {% endif %}
+
 </body>
+<script>
+    function show(canshu1, canshu2) {
+        var li01 = document.getElementById(canshu1)
+        var pic = document.getElementById('pic')
+        li01.onmouseover = function () {
+            pic.src = canshu2;
+            if (pic.fileSize > 0 || (pic.width > 0 && pic.height > 0)) {
+            }
+            else {
+                pic.src = "../static/images/background.jpg";
+            }
+        }
+    }
+    show("li01", "../static/media{{house.picture}}1.jpg")
+    show("li02", "../static/media{{house.picture}}2.jpg")
+    show("li03", "../static/media{{house.picture}}3.jpg")
+    show("li04", "../static/media{{house.picture}}4.jpg")
+    show("li05", "../static/media{{house.picture}}5.jpg") 
+</script>
+
 </html>

@@ -1,53 +1,54 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css"> 
-    <script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
-	<script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
-    <title>Document</title>
-    <style>
+<html lang="zh">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+        <script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+	    <script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+        <title>管理投诉</title>
+        <style>
+            .navbar {
+                margin-bottom: 0;
+                position: fixed;
+                left: 0;
+                right: 0;
+            }
 
-        .navbar {
-            margin-bottom: 0;
-            position: fixed;
-            left: 0;
-            right: 0;
-        }
+            .sidebar {
+                left:0px;
+                padding-top: 30px;
+                padding: 0;
+                position: fixed;
+                top: 52px;
+                bottom: 0;
+                text-align: center;
+                box-shadow: 3px 3px 3px rgba(170,170,170,0.3);
+            }
 
-        .sidebar {
-            left:0px;
-            padding-top: 30px;
-            padding: 0;
-            position: fixed;
-            top: 52px;
-            bottom: 0;
-            text-align: center;
-            box-shadow: 3px 3px 3px rgba(170,170,170,0.3);
-        }
+            .content {
+                position: fixed;
+                top: 52px;
+                right: 0;
+                bottom: 0;
+                overflow: scroll;
+            }
 
-        .content {
-            position: fixed;
-            top: 52px;
-            right: 0;
-            bottom: 0;
-            overflow: scroll;
-        }
-        .bk{
-            background-image: url("../static/images/bkg.jpg");
-            background-size: 100% 100%;
-            background-attachment: fixed;
-        }
-        .active{
-            background-color: #cccc99;
-        }
+            .active{
+                background-color: #cccc99;
+            }
 
-        .myli{
+            .myli{
             background-color: #CCFFFF;
-        }
-    </style>
-</head>
+            }
+
+            .bk{
+                background-image: url("../static/images/bkg.jpg");
+                background-size: 100% 100%;
+                background-attachment: fixed;
+            }
+        </style>
+    </head>
 <body class="bk">
     <div class="navbar  navbar-fixed-top" style="position: fixed;background:#66cccc ">
         <span style="display:inline-block">
@@ -119,82 +120,90 @@
                 <HR style="FILTER: alpha(opacity=100,finishopacity=0,style=3)" width="80%" color=#987cb9 SIZE=3>
             </div>
             <div class="col-md-10 content pull-right" style="margin-top: 50px;">
-                <form action="/create_apply/" method="post" role="form">
+                <form action="/manage_reporting/" method="post" role="form">
                     {% csrf_token %}
                     <div class="row">
                         <div class="col-md-6 col-md-offset-2 form-group">
-                            <label>租客用户名</label><br>
-                            <input name="username" type="text" class ="form-control" required/>
+                            <label>搜索投诉ID</label><br>
+                            <input type="text" name="report_id" class ="form-control"/>
                             <br/>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-md-6 col-md-offset-2 form-group">
-                            <label>
-                                房源ID
-                            </label><br>
-                            <input name="house_id" type="number" class ="form-control" required>
+                            <label>搜索用户名</label><br>
+                            <input type="text" name="username" class ="form-control"/>
                             <br/>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-md-6 col-md-offset-2 form-group">
-                            <label>
-                                短租
-                            </label><br>
-                            <input name="rent_type" type="radio" value="short" required/>
-                            <br/>
-                            <label>
-                                长租
-                            </label><br>
-                            <input name="rent_type" type="radio" value="long" required/>
+                            <label>查看未被处理的</label><br>
+                            <input type="radio" name="not_handled"/>
                             <br/>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-md-6 col-md-offset-2 form-group">
-                            <label>
-                                起始时间
-                            </label><br>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-2 col-md-offset-2 form-group">
-                            <input id="s_y" name="s_y" type="number" class ="form-control" min="2000" max="3000" required/>年
-                            <br/>
-                        </div>
-                        <div class="col-md-2 form-group">
-                            <input id="s_m" name="s_m" type="number" class ="form-control" min="1" max="12" required/>月
-                            <br/>
-                        </div>
-                        <div class="col-md-2 form-group">
-                            <input id="s_d" name="s_d" type="number" class ="form-control" min="1" max="31" onkeyup="checknumber()" required>日
-                            <br/>
-                            <span id="alert"></span>
-                        </div>
-                    </div>
-                    
-                    <div class="row">
-                        <div class="col-md-6 col-md-offset-2 form-group">
-                            <label>
-                                租房时长
-                            </label><br>
-                            <input name="duration" type="number" class ="form-control" required/>天/月
-                            <br>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6 col-md-offset-2 form-group">
-                            <button type="submit" name="sub" class="btn btn-default">提交</button>
+                            <span style="display:inline-block">
+                            <button type="submit"  class="btn btn-default">提交</button>
+                            </span>
+                            <span style="float:right; margin-top:0px">
+                            </span>
                             <br/>
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="col-md-6 col-md-offset-2 form-group">
-                        </div>
-                    </div>
-                    
                 </form>
+                <br/><br/>
+                {% if reports %}
+                    {% for i in reports %}
+                            <div class="col-md-6 col-sm-6" >
+                                <ul class="list-group" style="width:500px; ">
+                                    <label>投诉单编号：{{ i.report_id }}</label><br>
+                                    <li class="list-group-item myli">
+                                        <p style="font-size:15px; margin-top:8px;">投诉标题：{{ i.title }}</p>
+                                        <p style="font-size:15px; margin-top:8px;">订单id：{{ i.apply_id }}</p>
+                                    </li>
+                                    <li class="list-group-item myli">
+                                        <p style="font-size:15px; margin-top:8px;">发起用户：{{ i.username }}</p>
+                                    </li>
+                                    <li class="list-group-item myli">
+                                        <p style="font-size:15px; margin-top:8px;">审核状态：
+                                            {% if i.status == 1 %}
+                                                已处理
+                                            {% endif %}
+                                            {% if i.status == 0 %}
+                                                待处理
+                                            {% endif %}
+                                        </p>
+                                        {% if i.status == 1 %}
+                                            <p style="font-size:15px; margin-top:8px;">
+                                                处理工单的是：{{ i.handled_by }}
+                                            </p>
+                                        {% endif %}
+                                    </li>
+                                    <li class="list-group-item myli">
+                                        <span style="display:inline-block">
+                                            <p style="font-size:15px; margin-top:8px;">投诉原因描述：</p>
+                                            <p style="font-size:15px; margin-top:0px; text-indent: 2em;">{{ i.content }}</p>
+                                        </span>
+                                    </li>
+                                    {% if i.status == 0 %}
+                                    <li class="list-group-item myli">
+                                        <p style="font-size:15px; margin-top:8px;">操作：</p>
+                                            <form action="/handle_reporting/" method="post">
+                                            {% csrf_token %}
+                                            <input name="report_id" type="hidden" value="{{i.report_id}}" />
+                                            <span style="float:right; margin-top:-14px">
+                                                <button type="submit"  class="btn btn-default" style="margin-top:-32px;">处理投诉</button>
+                                            </span>
+                                            </form>
+                                    </li>
+                                    {% endif %}
+                                </ul>
+                            </div>
+                {% endfor %}
+            {% endif %}
             </div>
         </div>
     </div>
@@ -204,63 +213,4 @@
         </script>
     {% endif %}
 </body>
-<script>
-    function checknumber()
-    {
-        var year = document.getElementsById("s_y").value;
-        var month = document.getElementsById("s_x").value;
-        var day = document.getElementsById("s_d").value;
-        var alt = document.getElementById("alert");
-        var mybutton = document.getElementsById("sub");
-        if((year%4==0&&year%100!=0)||year%400==0)
-        {
-            if(month==2)
-            {
-                if(day>29||day<1)
-                {
-                    alt.innerHTML="日期格式错误";
-                }
-            }
-            else if(month==1||month==3||month==5||month==7||month==8||month==10||month==12)
-            {
-                if(day>31||day<1)
-                {
-                    alt.innerHTML="日期格式错误";
-                }
-            }
-            else
-            {
-                if(day>30||day<1)
-                {
-                    alt.innerHTML="日期格式错误";
-                }
-            }
-        }
-        else
-        {
-            if(month==2)
-            {
-                if(day>28||day<1)
-                {
-                    alt.innerHTML="日期格式错误";
-                }
-            }
-            else if(month==1||month==3||month==5||month==7||month==8||month==10||month==12)
-            {
-                if(day>31||day<1)
-                {
-                    alt.innerHTML="日期格式错误";
-                }
-            }
-            else
-            {
-                if(day>30||day<1)
-                {
-                    alt.innerHTML="日期格式错误";
-                }
-            }
-        }
-    }
-</script>
 </html>
-
